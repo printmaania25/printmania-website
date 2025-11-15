@@ -1,17 +1,116 @@
 const backapi = "http://localhost:5001";
 
 const Allapi = {
-  signup: {
-    url: `${backapi}/api/auth/register`,
-    method: "POST",
+  // signup: {
+  //   url: `${backapi}/api/auth/register`,
+  //   method: "POST",
+  // },
+  // login: {
+  //   url: `${backapi}/api/auth/login`,
+  //   method: "POST",
+  // },
+  // google: {
+  //   url: `${backapi}/api/auth/google`,
+  //   method: "POST",
+  // },
+
+  auth: {
+    register: {
+      url: `${backapi}/api/auth/register`,
+      method: "POST",
+    },
+    login: {
+      url: `${backapi}/api/auth/login`,
+      method: "POST",
+    },
+    google: {
+      url: `${backapi}/api/auth/google`,
+      method: "POST",
+    },
   },
-  login: {
-    url: `${backapi}/api/auth/login`,
-    method: "POST",
+
+  // Address routes
+  address: {
+    create: {
+      url: `${backapi}/api/address`,
+      method: "POST",
+    },
+    update: {
+      url: `${backapi}/api/address/:id`,
+      method: "PUT",
+    },
+    delete: {
+      url: `${backapi}/api/address/:id`,
+      method: "DELETE",
+    },
+    myaddresses: {
+      url: `${backapi}/api/address/myaddresses`,
+      method: "GET",
+    }
   },
-  google: {
-    url: `${backapi}/api/auth/google`,
-    method: "POST",
+
+  // Product routes
+  products: {
+    create: {
+      url: `${backapi}/api/products`,
+      method: "POST",
+    },
+    update: {
+      url: `${backapi}/api/products/:id`,
+      method: "PUT",
+    },
+    delete: {
+      url: `${backapi}/api/products/:id`,
+      method: "DELETE",
+    },
+    getAll: {
+      url: `${backapi}/api/products`,
+      method: "GET",
+    },
+  },
+
+  // Order routes
+  orders: {
+    create: {
+      url: `${backapi}/api/orders`,
+      method: "POST",
+    },
+    uploadScreenshots: {
+      url: `${backapi}/api/orders/:id/upload`,
+      method: "PUT",
+    },
+    cancel: {
+      url: `${backapi}/api/orders/:id/cancel`,
+      method: "PUT",
+    },
+    getMyOrders: {
+      url: `${backapi}/api/orders/myorders`,
+      method: "GET",
+    },
+    getAll: {
+      url: `${backapi}/api/orders`,
+      method: "GET",
+    },
+  },
+
+  // Banner routes
+  banners: {
+    create: {
+      url: `${backapi}/api/banners`,
+      method: "POST",
+    },
+    update: {
+      url: `${backapi}/api/banners/:id`,
+      method: "PUT",
+    },
+    delete: {
+      url: `${backapi}/api/banners/:id`,
+      method: "DELETE",
+    },
+    getAll: {
+      url: `${backapi}/api/banners`,
+      method: "GET",
+    },
   },
 };
 

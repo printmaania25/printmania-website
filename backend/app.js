@@ -2,6 +2,10 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import authRoutes from "./routes/auth_routes.js";
+import addressRoutes from "./routes/address_routes.js";
+import productRoutes from "./routes/product_routes.js";
+import orderRoutes from "./routes/order_routes.js";
+import bannerRoutes from "./routes/banner_routes.js";
 import cookieParser from "cookie-parser";
 import {database} from "./config/database.js"
 
@@ -21,6 +25,10 @@ app.use(express.json());
 
 // -------- Routes --------
 app.use("/api/auth", authRoutes);
+app.use("/api/address",addressRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/banners", bannerRoutes);
 app.get("/ping", (req, res) => {
   res.status(200).send("pong");
 });

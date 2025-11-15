@@ -1,57 +1,51 @@
-// src/Pages/GoogleCallback.jsx
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";  // For programmatic navigation
+import { useToast } from "../Providers/ToastProvider";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useRef } from "react";
 import Allapi from "../common";
 
 function GoogleCallback() {
+  const toastMsg = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
+  const calledRef = useRef(false); // 🔥 Prevent double effect call
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get("code");
+    if (calledRef.current) return;  // skip second StrictMode call
+    calledRef.current = true;
 
+    const code = new URLSearchParams(location.search).get("code");
     if (!code) {
-      console.error("Google returned no code");
-      navigate("/login");  // Redirect to login on error
+      toastMsg("error", "No authorization code from Google");
+      navigate("/login", { replace: true });
       return;
     }
 
-    // send the auth code to backend
-    fetch(Allapi.google.url, {
-      method: Allapi.google.method,
+    fetch(Allapi.auth.google, {
+      method: Allapi.auth.google.method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code }), // code goes to backend
+      body: JSON.stringify({ code }),
     })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-        }
-        return res.json();
-      })
+      .then((res) => res.json())
       .then((data) => {
-        if (!data.token) {
-          console.error("Backend returned no token");
-          alert(data.message || "Google login failed");
-          navigate("/login");
-          return;
+        if (!data.success) {
+          toastMsg("error", data.message || "Google login failed");
+          return navigate("/login", { replace: true });
         }
+
         localStorage.setItem("token", data.token);
         localStorage.setItem("role", data.user.role);
-        navigate(data.user.role === "admin" ? "/admin" : "/user");  // Use navigate instead of window.location
+        toastMsg("success", data.message);
+        navigate(data.user.role === "admin" ? "/admin" : "/user", { replace: true });
       })
-      .catch((err) => {
-        console.error("Error:", err);
-        alert("Google login error");
-        navigate("/login");
+      .catch(() => {
+        toastMsg("error", "Authentication error");
+        navigate("/login", { replace: true });
       });
-  }, [navigate]);
+  }, []);
 
   return (
     <div className="w-full h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-xl font-semibold mb-2">Logging in with Google...</h1>
-        <p className="text-gray-500">Please wait a moment.</p>
-      </div>
+      <h2 className="text-lg font-semibold text-gray-700">Logging in with Google...</h2>
     </div>
   );
 }

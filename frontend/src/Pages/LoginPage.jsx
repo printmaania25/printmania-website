@@ -1,5 +1,6 @@
 // src/Pages/LoginPage.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import toast, { Toaster } from "react-hot-toast";
 import Allapi from "../common";
 
 function LoginPage() {
@@ -13,10 +14,67 @@ function LoginPage() {
   const [name, setName] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  // ---------------- GLOBAL TOAST HANDLER -------------------
+  // This useEffect checks for tempToast in localStorage on mount
+  // and shows it if present (for cases where redirect happens from other pages)
+  // Move this logic to a custom hook or App level for true globality
+  useEffect(() => {
+    const tempToastStr = localStorage.getItem("tempToast");
+    if (tempToastStr) {
+      const tempToast = JSON.parse(tempToastStr);
+      if (tempToast.type === "success") {
+        toast.success(tempToast.message);
+      } else if (tempToast.type === "error") {
+        toast.error(tempToast.message);
+      }
+      // Clear after showing
+      localStorage.removeItem("tempToast");
+    }
+  }, []);
+
+  // ---------------- GOOGLE CALLBACK HANDLER -------------------
+  const handleGoogleCallback = async (code) => {
+    try {
+      const res = await fetch(Allapi.auth.google.url, {
+        method: Allapi.auth.google.method || "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code }),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("role", data.user.role);
+        // Store toast message for next page
+        localStorage.setItem("tempToast", JSON.stringify({ type: "success", message: data.message }));
+        // Clean up URL params
+        window.history.replaceState({}, document.title, window.location.pathname);
+        // Redirect immediately
+        window.location.href = data.user.role === "admin" ? "/admin" : "/user";
+      } else {
+        toast.error(data.message || "Google login failed");
+        // Clean up URL params on error too
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Google authentication error");
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  };
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get("code");
+    if (code) {
+      handleGoogleCallback(code);
+    }
+  }, []);
+
   // ---------------- SIGNUP -------------------
   const handleSignup = async () => {
     if (password !== confirmPassword) {
-      alert("Passwords do not match");
+      toast.error("Passwords do not match");
       return;
     }
 
@@ -28,16 +86,19 @@ function LoginPage() {
       });
       const data = await res.json();
 
-      if (data.token) {
+      if (data.success) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("role", data.user.role);
+        // Store toast message for next page
+        localStorage.setItem("tempToast", JSON.stringify({ type: "success", message: data.message }));
+        // Redirect immediately
         window.location.href = "/user";
       } else {
-        alert(data.message || "Signup failed");
+        toast.error(data.message || "Signup failed");
       }
     } catch (err) {
       console.error(err);
-      alert("Signup error");
+      toast.error("Signup error");
     }
   };
 
@@ -52,16 +113,19 @@ function LoginPage() {
 
       const data = await res.json();
 
-      if (data.token) {
+      if (data.success) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("role", data.user.role);
+        // Store toast message for next page
+        localStorage.setItem("tempToast", JSON.stringify({ type: "success", message: data.message }));
+        // Redirect immediately
         window.location.href = data.user.role === "admin" ? "/admin" : "/user";
       } else {
-        alert(data.message || "Login failed");
+        toast.error(data.message || "Login failed");
       }
     } catch (err) {
       console.error(err);
-      alert("Login error");
+      toast.error("Login error");
     }
   };
 
@@ -230,5 +294,6 @@ function LoginPage() {
     </div>
   );
 }
+
 
 export default LoginPage;
