@@ -5,6 +5,7 @@ import {
   cancelOrder,
   getOrdersByUser,
   getAllOrders,
+  markDelivered
 } from "../controllers/order_controller.js";
 
 import { auth, isAdmin } from "../middleware/auth.js";
@@ -19,5 +20,6 @@ router.get("/myorders", auth, getOrdersByUser);
 
 // ADMIN ROUTES
 router.get("/", auth, isAdmin, getAllOrders);
+router.put("/:id/delivered", auth, isAdmin, markDelivered);
 
 export default router;

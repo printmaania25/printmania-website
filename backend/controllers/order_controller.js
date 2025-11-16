@@ -4,7 +4,7 @@ import User from "../models/User.js";
 
 export const createOrder = async (req, res) => {
   try {
-    const { productId, size, quantity, address } = req.body;
+    const { productId, size,price, quantity, address } = req.body;
 
     const product = await Product.findById(productId);
     if (!product)
@@ -18,6 +18,7 @@ export const createOrder = async (req, res) => {
         name: product.name,
         pictures: product.pictures,
         size,
+        price,
         quantity,
         total_price,
         uploadrequired: product.uploadrequired,
@@ -92,6 +93,24 @@ export const getOrdersByUser = async (req, res) => {
   try {
     const orders = await Order.find({ userId: req.user._id }).sort({ createdAt: -1 });
     res.json({ success: true, orders });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+export const markDelivered = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const order = await Order.findById(id);
+    if (!order)
+      return res.status(404).json({ success: false, message: "Order not found" });
+
+    order.delivered = true;
+    await order.save();
+
+    res.json({ success: true, message: "Order marked as delivered", order });
+
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

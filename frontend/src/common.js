@@ -1,19 +1,6 @@
 const backapi = "http://localhost:5001";
 
 const Allapi = {
-  // signup: {
-  //   url: `${backapi}/api/auth/register`,
-  //   method: "POST",
-  // },
-  // login: {
-  //   url: `${backapi}/api/auth/login`,
-  //   method: "POST",
-  // },
-  // google: {
-  //   url: `${backapi}/api/auth/google`,
-  //   method: "POST",
-  // },
-
   auth: {
     register: {
       url: `${backapi}/api/auth/register`,
@@ -29,6 +16,13 @@ const Allapi = {
     },
   },
 
+  user: {
+  update: {
+    url: `${backapi}/api/user/update`,
+    method: "PUT",
+  }
+},
+
   // Address routes
   address: {
     create: {
@@ -36,17 +30,17 @@ const Allapi = {
       method: "POST",
     },
     update: {
-      url: `${backapi}/api/address/:id`,
+      url: (id) => `${backapi}/api/address/${id}`,
       method: "PUT",
     },
     delete: {
-      url: `${backapi}/api/address/:id`,
+      url: (id) => `${backapi}/api/address/${id}`,
       method: "DELETE",
     },
     myaddresses: {
       url: `${backapi}/api/address/myaddresses`,
       method: "GET",
-    }
+    },
   },
 
   // Product routes
@@ -56,11 +50,11 @@ const Allapi = {
       method: "POST",
     },
     update: {
-      url: `${backapi}/api/products/:id`,
+      url: (id) => `${backapi}/api/products/${id}`,
       method: "PUT",
     },
     delete: {
-      url: `${backapi}/api/products/:id`,
+      url: (id) => `${backapi}/api/products/${id}`,
       method: "DELETE",
     },
     getAll: {
@@ -76,11 +70,11 @@ const Allapi = {
       method: "POST",
     },
     uploadScreenshots: {
-      url: `${backapi}/api/orders/:id/upload`,
+      url: (id) => `${backapi}/api/orders/${id}/upload`,
       method: "PUT",
     },
     cancel: {
-      url: `${backapi}/api/orders/:id/cancel`,
+      url: (id) => `${backapi}/api/orders/${id}/cancel`,
       method: "PUT",
     },
     getMyOrders: {
@@ -100,11 +94,11 @@ const Allapi = {
       method: "POST",
     },
     update: {
-      url: `${backapi}/api/banners/:id`,
+      url: (id) => `${backapi}/api/banners/${id}`,
       method: "PUT",
     },
     delete: {
-      url: `${backapi}/api/banners/:id`,
+      url: (id) => `${backapi}/api/banners/${id}`,
       method: "DELETE",
     },
     getAll: {

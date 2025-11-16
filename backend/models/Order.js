@@ -12,6 +12,7 @@ const orderSchema = new mongoose.Schema(
       name: { type: String, required: true },
       pictures: [{ type: String }],
       size: { type: String }, // optional
+      price: { type: Number, required: true },
       quantity: { type: Number, required: true },
       total_price: { type: Number, required: true },
       uploadrequired: { type: Boolean, default: false },
@@ -41,6 +42,8 @@ const orderSchema = new mongoose.Schema(
     transactionscreenshot: [{ type: String }], // image URL array
 
     cancelled: { type: Boolean, default: false },
+    delivered: { type: Boolean, default: false }
+
   },
   { timestamps: true }
 );

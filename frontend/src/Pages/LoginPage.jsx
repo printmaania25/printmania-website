@@ -1,9 +1,13 @@
 // src/Pages/LoginPage.jsx
-import { useState, useEffect } from "react";
-import toast, { Toaster } from "react-hot-toast";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "../Providers/ToastProvider";
 import Allapi from "../common";
 
 function LoginPage() {
+  const navigate = useNavigate();
+  const toastMsg = useToast();
+
   const [isSignup, setIsSignup] = useState(false);
 
   // shared fields
@@ -14,118 +18,63 @@ function LoginPage() {
   const [name, setName] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  // ---------------- GLOBAL TOAST HANDLER -------------------
-  // This useEffect checks for tempToast in localStorage on mount
-  // and shows it if present (for cases where redirect happens from other pages)
-  // Move this logic to a custom hook or App level for true globality
-  useEffect(() => {
-    const tempToastStr = localStorage.getItem("tempToast");
-    if (tempToastStr) {
-      const tempToast = JSON.parse(tempToastStr);
-      if (tempToast.type === "success") {
-        toast.success(tempToast.message);
-      } else if (tempToast.type === "error") {
-        toast.error(tempToast.message);
-      }
-      // Clear after showing
-      localStorage.removeItem("tempToast");
-    }
-  }, []);
-
-  // ---------------- GOOGLE CALLBACK HANDLER -------------------
-  const handleGoogleCallback = async (code) => {
-    try {
-      const res = await fetch(Allapi.auth.google.url, {
-        method: Allapi.auth.google.method || "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code }),
-      });
-      const data = await res.json();
-
-      if (data.success) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("role", data.user.role);
-        // Store toast message for next page
-        localStorage.setItem("tempToast", JSON.stringify({ type: "success", message: data.message }));
-        // Clean up URL params
-        window.history.replaceState({}, document.title, window.location.pathname);
-        // Redirect immediately
-        window.location.href = data.user.role === "admin" ? "/admin" : "/user";
-      } else {
-        toast.error(data.message || "Google login failed");
-        // Clean up URL params on error too
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("Google authentication error");
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-  };
-
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get("code");
-    if (code) {
-      handleGoogleCallback(code);
-    }
-  }, []);
-
   // ---------------- SIGNUP -------------------
   const handleSignup = async () => {
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
+      toastMsg("error", "Passwords do not match");
       return;
     }
 
     try {
-      const res = await fetch(Allapi.signup.url, {
-        method: Allapi.signup.method,
+      const res = await fetch(Allapi.auth.register.url, {
+        method: Allapi.auth.register.method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
       });
+
       const data = await res.json();
 
-      if (data.success) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("role", data.user.role);
-        // Store toast message for next page
-        localStorage.setItem("tempToast", JSON.stringify({ type: "success", message: data.message }));
-        // Redirect immediately
-        window.location.href = "/user";
-      } else {
-        toast.error(data.message || "Signup failed");
+      if (!data.success) {
+        toastMsg("error", data.message || "Signup failed");
+        return;
       }
+
+localStorage.setItem("token", data.token);
+localStorage.setItem("userdetails", JSON.stringify(data.user));
+      toastMsg("success", data.message);
+
+      navigate("/user", { replace: true });
     } catch (err) {
       console.error(err);
-      toast.error("Signup error");
+      toastMsg("error", "Signup error");
     }
   };
 
   // ---------------- LOGIN -------------------
   const handleLogin = async () => {
     try {
-      const res = await fetch(Allapi.login.url, {
-        method: Allapi.login.method,
+      const res = await fetch(Allapi.auth.login.url, {
+        method: Allapi.auth.login.method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
 
-      if (data.success) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("role", data.user.role);
-        // Store toast message for next page
-        localStorage.setItem("tempToast", JSON.stringify({ type: "success", message: data.message }));
-        // Redirect immediately
-        window.location.href = data.user.role === "admin" ? "/admin" : "/user";
-      } else {
-        toast.error(data.message || "Login failed");
+      if (!data.success) {
+        toastMsg("error", data.message || "Login failed");
+        return;
       }
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("role", data.user.role);
+
+      toastMsg("success", data.message);
+
+      navigate(data.user.role === "admin" ? "/admin" : "/user", { replace: true });
     } catch (err) {
       console.error(err);
-      toast.error("Login error");
+      toastMsg("error", "Login error");
     }
   };
 
@@ -134,10 +83,11 @@ function LoginPage() {
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
     const redirectUri = encodeURIComponent("http://localhost:5173/google/callback");
     const scope = encodeURIComponent("openid email profile");
+
     const googleURL =
       `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}` +
       `&redirect_uri=${redirectUri}` +
-      `&response_type=code` + // IMPORTANT: code flow
+      `&response_type=code` +
       `&scope=${scope}` +
       `&access_type=offline` +
       `&prompt=select_account`;
@@ -294,6 +244,5 @@ function LoginPage() {
     </div>
   );
 }
-
 
 export default LoginPage;

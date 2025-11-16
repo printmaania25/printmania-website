@@ -1,50 +1,54 @@
-// middleware/auth.js
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
+
 export const auth = async (req, res, next) => {
   try {
-    const token = req.headers.authorization?.split(" ")[1];
+    const authHeader = req.headers.authorization;
 
-    if (!token)
-      return res.status(401).json({ success: false, message: "No token provided" });
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Authorization header missing" });
+    }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const token = authHeader.split(" ")[1];
+
+    // verify token
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid or expired token" });
+    }
 
     const user = await User.findById(decoded.id);
     if (!user)
-      return res.status(401).json({ success: false, message: "User not found" });
+      return res.status(404).json({ success: false, message: "User not found" });
 
-    req.user = user; // Logged in user stored here
+    req.user = user;
+    req.tokenData = decoded; // IMPORTANT FIX 🔥
+
     next();
   } catch (err) {
-    res.status(401).json({ success: false, message: "Unauthorized" });
+    res.status(500).json({ success: false, message: "Auth error" });
   }
 };
 
 
 export const isAdmin = (req, res, next) => {
   try {
-    // Check user stored by auth()
-    if (!req.user) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Unauthorized" });
-    }
+    if (!req.user)
+      return res.status(401).json({ success: false, message: "Unauthorized" });
 
-    // Check role inside the JWT token also
-    if (req.tokenData.role !== "admin") {
-      return res
-        .status(403)
-        .json({ success: false, message: "Admin token required" });
-    }
+    // NOW req.tokenData is available
+    if (req.tokenData.role !== "admin")
+      return res.status(403).json({ success: false, message: "Admin token required" });
 
-    // Final check: user record role
-    if (req.user.role !== "admin") {
-      return res
-        .status(403)
-        .json({ success: false, message: "Admin access denied" });
-    }
+    if (req.user.role !== "admin")
+      return res.status(403).json({ success: false, message: "Admin access denied" });
 
     next();
   } catch (err) {

@@ -20,7 +20,7 @@ function GoogleCallback() {
       return;
     }
 
-    fetch(Allapi.auth.google, {
+    fetch(Allapi.auth.google.url, {
       method: Allapi.auth.google.method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ code }),
@@ -32,8 +32,8 @@ function GoogleCallback() {
           return navigate("/login", { replace: true });
         }
 
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("role", data.user.role);
+localStorage.setItem("token", data.token);
+localStorage.setItem("userdetails", JSON.stringify(data.user));
         toastMsg("success", data.message);
         navigate(data.user.role === "admin" ? "/admin" : "/user", { replace: true });
       })
