@@ -191,6 +191,14 @@ fetchBulkQuotes();
               )}
             </div>
 
+          {selectedOrder.cancelled && (
+            <div className="mt-4 mb-4  bg-red-100 border-l-4 border-red-500 rounded-xl p-4">
+                      <p className="text-red-700 font-semibold text-sm">
+                        ❌ Order Cancelled — For refund assistance contact: <span className="font-bold">+91 90633 47447</span>
+                      </p>
+              </div>
+            )}
+
             {selectedOrder.trackingId && (
               <div className="mb-6 bg-blue-50 rounded-xl p-4 text-center">
                 <p className="text-sm font-medium text-blue-600">Tracking ID</p>
@@ -360,6 +368,7 @@ fetchBulkQuotes();
                       </div>
                     )}
 
+
                     <div className="mt-6 pt-6 border-t-2 border-gray-200">
                       <div className="flex items-center justify-between">
                         <span className="text-lg font-semibold text-gray-700">Total Amount</span>
@@ -384,6 +393,21 @@ fetchBulkQuotes();
                 {hasTransactionScreenshots && (
                   <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
                     <h3 className="text-xl font-bold text-gray-800 mb-4">Transaction Screenshots</h3>
+                    {/* COD section */}
+                    {selectedOrder.cod && !selectedOrder.delivered && (
+                      <div className="mt-4 mb-4 bg-yellow-100 border-l-4 border-yellow-500 rounded-xl p-4">
+                        <p className="text-yellow-800 font-semibold text-sm">
+                          💵 Cash on Delivery — 60% Paid Online, Remaining 40% will be collected at delivery.
+                        </p>
+                      </div>
+                    )}
+                    {selectedOrder.cod && selectedOrder.delivered && (
+                      <div className="mt-4 mb-4 bg-yellow-100 border-l-4 border-yellow-500 rounded-xl p-4">
+                        <p className="text-yellow-800 font-semibold text-sm">
+                          💵 Cash on Delivery 
+                        </p>
+                      </div>
+                    )}
                     <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
                       {selectedOrder.transactionscreenshot.map((img, idx) => (
                         <img key={idx} src={img} className="w-full h-24 object-cover rounded-lg shadow-md border-2 border-blue-200" alt={`Screenshot ${idx + 1}`} />
@@ -519,7 +543,7 @@ fetchBulkQuotes();
             <div className="bg-blue-50 rounded-xl p-4 mb-6">
               <p className="text-gray-700 mb-2">For refund or queries, contact:</p>
               <a href="tel:+918008791893" className="text-xl font-bold text-blue-600 hover:text-blue-800 transition-colors">
-                +91 8008791893
+                +91 9063347447
               </a>
             </div>
             <div className="flex gap-4">

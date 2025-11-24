@@ -16,32 +16,58 @@ function ProductManagement() {
 
   // modal state
   const [showModal, setShowModal] = useState(false);
-  const [viewingProduct, setViewingProduct] = useState(null); // for view mode
-  const [isEditing, setIsEditing] = useState(false); // true for add/edit, false for view
+  const [viewingProduct, setViewingProduct] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState({ show: false, id: null });
 
-  // Allowed phrases
+  // Updated Allowed Phrases (must match backend exactly)
   const ALLOWED_PHRASES = [
-    "What's trending",
-    "new arraivals",
-    "best seller",
-    "Popular gifts",
-    "Featured products"
+    "Best selling",
+    "Popular Gifts",
+    "Below 500 Rs",
+    "New Arrival",
+    "Signature Day Special",
+    "Event Special",
+    "What's Trending",
+    "Corporate Gifting"
+  ];
+
+  // Updated Categories (must match backend enum exactly)
+  const CATEGORIES = [
+    "Mugs",
+    "Photo frames",
+    "Polaroid Photos",
+    "Key chains",
+    "Banners",
+    "T shirts",
+    "Hoodies",
+    "Sweat shirts",
+    "Full hand t shirts",
+    "Posters",
+    "ID cards",
+    "Signature Day t shirts",
+    "Puzzles Boards",
+    "Stickkers",
+    "Dairies",
+    "Bags",
+    "Pens",
+    "Ceritificates",
+    "Other Gift articles"
   ];
 
   // form state
   const initialForm = {
     name: "",
-    sizes: [], // array of sizes
-    category: "T-shirts",
+    sizes: [],
+    category: "Mugs", // valid default
     mrp: "",
     price: "",
     uploadrequired: false,
-    pictures: [], // array of urls
-    phrases: [], // array of phrases
+    pictures: [],
+    phrases: [],
   };
   const [form, setForm] = useState(initialForm);
-  const [newSize, setNewSize] = useState(""); // for dynamic sizes
+  const [newSize, setNewSize] = useState("");
   const fileInputRef = useRef(null);
   const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
   const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
@@ -79,11 +105,10 @@ function ProductManagement() {
   function openViewModal(prod) {
     setViewingProduct(prod);
     setIsEditing(false);
-    // populate form for view
     setForm({
       name: prod.name || "",
       sizes: prod.sizes || [],
-      category: prod.category || "T-shirts",
+      category: prod.category || "T shirts",
       mrp: prod.mrp || "",
       price: prod.price || "",
       uploadrequired: prod.uploadrequired || false,
@@ -152,11 +177,10 @@ function ProductManagement() {
   };
 
   const removeSize = (index) => {
-    setForm((prev) => {
-      const next = { ...prev };
-      next.sizes = next.sizes.filter((_, i) => i !== index);
-      return next;
-    });
+    setForm((prev) => ({
+      ...prev,
+      sizes: prev.sizes.filter((_, i) => i !== index),
+    }));
   };
 
   const togglePhrase = (phrase) => {
@@ -224,7 +248,7 @@ function ProductManagement() {
         if (data.success) {
           toastMsg("success", "Product updated");
           setIsEditing(false);
-          setForm({ ...form, ...payload }); // update form with saved data
+          setForm({ ...form, ...payload });
           fetchProducts();
         } else {
           toastMsg("error", data.message || "Update failed");
@@ -273,11 +297,10 @@ function ProductManagement() {
   }
 
   function removePictureAt(index) {
-    setForm(prev => {
-      const next = { ...prev };
-      next.pictures = next.pictures.filter((_, i) => i !== index);
-      return next;
-    });
+    setForm(prev => ({
+      ...prev,
+      pictures: prev.pictures.filter((_, i) => i !== index),
+    }));
   }
 
   function closeModal() {
@@ -324,7 +347,6 @@ function ProductManagement() {
               className="bg-white rounded-2xl shadow-md overflow-hidden cursor-pointer hover:shadow-xl transition-shadow duration-200 border border-gray-100"
               onClick={() => openViewModal(p)}
             >
-              {/* Images Section - Horizontal Scroll if Multiple */}
               <div className="relative h-48 overflow-hidden">
                 <div
                   className={`flex h-full transition-transform duration-300 ${
@@ -356,7 +378,6 @@ function ProductManagement() {
                 </div>
               </div>
 
-              {/* Product Info */}
               <div className="p-4">
                 <h3 className="font-semibold text-gray-900 mb-2 text-sm leading-tight">
                   {p.name}
@@ -394,7 +415,7 @@ function ProductManagement() {
           ))}
         </div>
 
-        {/* Pagination Arrows */}
+        {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex justify-center items-center gap-4">
             <button
@@ -402,42 +423,18 @@ function ProductManagement() {
               disabled={currentPage === 1}
               className="p-2 bg-white rounded-full shadow-md hover:shadow-lg disabled:opacity-50 transition-shadow border border-gray-200"
             >
-              <svg
-                className="w-5 h-5 text-blue-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
+              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-
-            <span className="text-sm text-gray-600">
-              Page {currentPage} of {totalPages}
-            </span>
-
+            <span className="text-sm text-gray-600">Page {currentPage} of {totalPages}</span>
             <button
               onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages}
               className="p-2 bg-white rounded-full shadow-md hover:shadow-lg disabled:opacity-50 transition-shadow border border-gray-200"
             >
-              <svg
-                className="w-5 h-5 text-blue-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
+              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
           </div>
@@ -447,11 +444,8 @@ function ProductManagement() {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 px-4">
-          <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={() => setShowModal(false)}
-          />
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto z-10 relative border border-gray-100" style={{scrollbarWidth:'none'}}>
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowModal(false)} />
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto z-10 relative border border-gray-100" style={{ scrollbarWidth: 'none' }}>
             {/* Header */}
             <div className="sticky top-0 bg-white border-b border-gray-100 p-6 rounded-t-3xl">
               <div className="flex items-center justify-between">
@@ -460,19 +454,13 @@ function ProductManagement() {
                 </h3>
                 <div className="flex items-center gap-2">
                   {viewingProduct && !isEditing && (
-                    <button
-                      onClick={enableEdit}
-                      className="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 transition-colors"
-                    >
+                    <button onClick={enableEdit} className="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 transition-colors">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                       </svg>
                     </button>
                   )}
-                  <button
-                    onClick={closeModal}
-                    className="p-2 text-gray-400 hover:text-gray-600"
-                  >
+                  <button onClick={closeModal} className="p-2 text-gray-400 hover:text-gray-600">
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -484,6 +472,7 @@ function ProductManagement() {
             {/* Content */}
             <div className="p-6 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Product Name */}
                 <div>
                   <label className="block mb-2 font-semibold text-gray-700">
                     Product Name {isEditing || !viewingProduct ? "*" : ""}
@@ -496,6 +485,7 @@ function ProductManagement() {
                   />
                 </div>
 
+                {/* Category - Updated */}
                 <div>
                   <label className="block mb-2 font-semibold text-gray-700">
                     Category {isEditing || !viewingProduct ? "*" : ""}
@@ -506,15 +496,13 @@ function ProductManagement() {
                     onChange={(e) => setForm({ ...form, category: e.target.value })}
                     disabled={!isEditing && viewingProduct}
                   >
-                    <option>T-shirts</option>
-                    <option>KeyChains</option>
-                    <option>Dairys</option>
-                    <option>Books</option>
-                    <option>IdCards</option>
-                    <option>Others</option>
+                    {CATEGORIES.map((cat) => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
                   </select>
                 </div>
 
+                {/* MRP */}
                 <div>
                   <label className="block mb-2 font-semibold text-gray-700">
                     MRP {isEditing || !viewingProduct ? "*" : ""}
@@ -528,6 +516,7 @@ function ProductManagement() {
                   />
                 </div>
 
+                {/* Price */}
                 <div>
                   <label className="block mb-2 font-semibold text-gray-700">
                     Price {isEditing || !viewingProduct ? "*" : ""}
@@ -541,14 +530,12 @@ function ProductManagement() {
                   />
                 </div>
 
-                {/* Phrases */}
+                {/* Phrases - Updated */}
                 <div className="md:col-span-2">
-                  <label className="block mb-2 font-semibold text-gray-700">
-                    Phrases {isEditing || !viewingProduct ? "" : ""}
-                  </label>
+                  <label className="block mb-2 font-semibold text-gray-700">Phrases</label>
                   <div className="space-y-3">
                     {ALLOWED_PHRASES.map((phrase) => (
-                      <label key={phrase} className="flex items-center space-x-2 cursor-pointer disabled:cursor-not-allowed">
+                      <label key={phrase} className="flex items-center space-x-2 cursor-pointer">
                         <input
                           type="checkbox"
                           checked={form.phrases.includes(phrase)}
@@ -563,15 +550,29 @@ function ProductManagement() {
                   {form.phrases.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-3">
                       {form.phrases.map((phrase, idx) => (
-                        <span
+                        <div
                           key={idx}
-                          className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs"
+                          className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm flex items-center gap-1"
                         >
                           {phrase}
-                        </span>
+                          {(!isEditing) ? null : (
+                            <button
+                              onClick={() =>
+                                setForm(prev => ({
+                                  ...prev,
+                                  phrases: prev.phrases.filter((_, i) => i !== idx),
+                                }))
+                              }
+                              className="ml-1 text-red-500 hover:text-red-700"
+                            >
+                              ×
+                            </button>
+                          )}
+                        </div>
                       ))}
                     </div>
                   )}
+
                 </div>
 
                 {/* Sizes */}
@@ -595,16 +596,10 @@ function ProductManagement() {
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {form.sizes.map((size, idx) => (
-                      <div
-                        key={idx}
-                        className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm flex items-center gap-1"
-                      >
+                      <div key={idx} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm flex items-center gap-1">
                         {size}
-                        {(!isEditing || viewingProduct) ? null : (
-                          <button
-                            onClick={() => removeSize(idx)}
-                            className="ml-1 text-red-500 hover:text-red-700"
-                          >
+                        {(!isEditing ) ? null : (
+                          <button onClick={() => removeSize(idx)} className="ml-1 text-red-500 hover:text-red-700">
                             ×
                           </button>
                         )}
@@ -613,14 +608,12 @@ function ProductManagement() {
                   </div>
                 </div>
 
-                {/* Upload Required Toggle */}
+                {/* Upload Required */}
                 <div className="md:col-span-2">
                   <label className="block mb-2 font-semibold text-gray-700">Upload Required</label>
                   <div
                     className={`relative inline-block w-12 h-6 rounded-full transition-colors ${
-                      form.uploadrequired
-                        ? "bg-blue-600"
-                        : "bg-gray-300"
+                      form.uploadrequired ? "bg-blue-600" : "bg-gray-300"
                     } ${(!isEditing && viewingProduct) ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
                     onClick={() => {
                       if (isEditing || !viewingProduct) {
@@ -688,7 +681,7 @@ function ProductManagement() {
               </div>
             </div>
 
-            {/* Footer Actions */}
+            {/* Footer */}
             <div className="sticky bottom-0 bg-white border-t border-gray-100 p-6 rounded-b-3xl flex justify-end gap-3">
               <button
                 onClick={closeModal}
@@ -719,7 +712,7 @@ function ProductManagement() {
         </div>
       )}
 
-      {/* Confirm delete */}
+      {/* Delete Confirmation */}
       {confirmDelete.show && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50" />

@@ -110,7 +110,7 @@ function Order() {
 
       const updatedScreenshots = order.transactionscreenshot.filter(u => u !== imgUrl);
       setOrder(prev => ({ ...prev, transactionscreenshot: updatedScreenshots }));
-
+ 
       const res = await fetch(Allapi.orders.uploadScreenshots.url(id), {
         method: "PUT",
         headers: {
@@ -149,6 +149,7 @@ function Order() {
       setIsDoneLoading(true);
       setIsPlacingOrder(true);
       let success = true;
+      console.log("cod enabled:",codEnabled);
       if (pendingScreenshots.length > 0) {
         const allScreenshots = [...(order.transactionscreenshot || []), ...pendingScreenshots];
         const res = await fetch(Allapi.orders.uploadScreenshots.url(id), {

@@ -2,12 +2,15 @@ import mongoose from "mongoose";
 
 
 const ALLOWED_PHRASES = [
-  "What's trending",
-  "new arraivals",
-  "best seller",
-  "Popular gifts",
-  "Featured products"
-];
+  "Best selling",
+  "Popular Gifts",
+  "Below 500 Rs",
+  "New Arrival",
+  "Signature Day Special",
+  "Event Special",
+  "What's Trending",
+  "Corporate Gifting"
+]
 
 const productSchema = new mongoose.Schema(
   {
@@ -16,7 +19,27 @@ const productSchema = new mongoose.Schema(
     sizes: [{ type: String }], // optional
     category: {
       type: String,
-      enum: ["T-shirts", "KeyChains", "Dairys", "Books", "IdCards" , "Others"],
+      enum: [
+        "Mugs",
+        "Photo frames",
+        "Polaroid Photos",
+        "Key chains",
+        "Banners",
+        "T shirts",
+        "Hoodies",
+        "Sweat shirts",
+        "Full hand t shirts",
+        "Posters",
+        "ID cards",
+        "Signature Day t shirts",
+        "Puzzles Boards",
+        "Stickkers",
+        "Dairies",
+        "Bags",
+        "Pens",
+        "Ceritificates",
+        "Other Gift articles"
+      ],
       required: true,
     },
 
