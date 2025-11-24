@@ -85,6 +85,10 @@ const Allapi = {
       url: `${backapi}/api/orders`,
       method: "GET",
     },
+    assignTracking: {
+      url: (id) => `${backapi}/api/orders/${id}/tracking`,
+      method: "PUT",
+    },
   },
 
   // Banner routes
@@ -103,6 +107,58 @@ const Allapi = {
     },
     getAll: {
       url: `${backapi}/api/banners`,
+      method: "GET",
+    },
+  },
+
+  quotes: {
+    create: {
+      url: `${backapi}/api/quotes`,
+      method: "POST",
+    },
+    getAll: {
+      url: `${backapi}/api/quotes`,
+      method: "GET",
+    },
+    confirm: {
+      url: (id) => `${backapi}/api/quotes/${id}/confirm`,
+      method: "PUT",
+    },
+    assignTracking: {
+      url: (id) => `${backapi}/api/quotes/${id}/tracking`,
+      method: "PUT",
+    },
+    cancelBulk: {
+    url: (id) => `${backapi}/api/quotes/cancel/bulk/${id}`,
+    method: "PUT",
+    },
+    getBulkByUser: {
+      url: `${backapi}/api/quotes/bulk`,
+      method: "GET",
+    },
+    markDelivered: {
+      url: (id) => `${backapi}/api/quotes/${id}/delivered`,
+      method: "PUT",
+    },
+
+
+  },
+
+  offers: {
+    create: {
+      url: `${backapi}/api/offers/create`,
+      method: "POST",
+    },
+    update: {
+      url: (id) => `${backapi}/api/offers/edit/${id}`,
+      method: "PUT",
+    },
+    delete: {
+      url: (id) => `${backapi}/api/offers/delete/${id}`,
+      method: "DELETE",
+    },
+    getAll: {
+      url: `${backapi}/api/offers/all`,
       method: "GET",
     },
   },

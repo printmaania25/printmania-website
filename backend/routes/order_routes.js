@@ -5,7 +5,8 @@ import {
   cancelOrder,
   getOrdersByUser,
   getAllOrders,
-  markDelivered
+  markDelivered,
+  assignTrackingId
 } from "../controllers/order_controller.js";
 
 import { auth, isAdmin } from "../middleware/auth.js";
@@ -21,5 +22,7 @@ router.get("/myorders", auth, getOrdersByUser);
 // ADMIN ROUTES
 router.get("/", auth, isAdmin, getAllOrders);
 router.put("/:id/delivered", auth, isAdmin, markDelivered);
+router.put("/:id/tracking", auth, isAdmin, assignTrackingId);
+
 
 export default router;

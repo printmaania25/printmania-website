@@ -1,3 +1,4 @@
+// BannerManagement.jsx
 import { useEffect, useState, useRef } from "react";
 import { useToast } from "../Providers/ToastProvider";
 import Allapi from "../common";
@@ -8,7 +9,11 @@ function BannerManagement() {
 
   const [banners, setBanners] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [uploadLoading, setUploadLoading] = useState(false);
+  const [desktopUploadLoading, setDesktopUploadLoading] = useState(false);
+  const [mobileUploadLoading, setMobileUploadLoading] = useState(false);
+  const [savingBanner, setSavingBanner] = useState(false);
+  const [editingLoadingId, setEditingLoadingId] = useState(null);
+  const [deletingLoadingId, setDeletingLoadingId] = useState(null);
 
   const [showModal, setShowModal] = useState(false);
   const [editingBanner, setEditingBanner] = useState(null);
@@ -56,6 +61,7 @@ function BannerManagement() {
   }
 
   function openEditModal(banner) {
+    setEditingLoadingId(banner._id);
     setEditingBanner(banner);
     setForm({
       title: banner.title,
@@ -63,6 +69,7 @@ function BannerManagement() {
       mobileBanner: banner.mobileBanner,
     });
     setShowModal(true);
+    setEditingLoadingId(null);
   }
 
   const uploadToCloudinary = async (file) => {
@@ -90,10 +97,20 @@ function BannerManagement() {
     const file = e.target.files[0];
     if (!file) return;
 
-    setUploadLoading(true);
+    if (type === 'desktopBanner') {
+      setDesktopUploadLoading(true);
+    } else {
+      setMobileUploadLoading(true);
+    }
+
     const link = await uploadToCloudinary(file);
     if (link) setForm((prev) => ({ ...prev, [type]: link }));
-    setUploadLoading(false);
+
+    if (type === 'desktopBanner') {
+      setDesktopUploadLoading(false);
+    } else {
+      setMobileUploadLoading(false);
+    }
   };
 
   async function handleSave() {
@@ -101,6 +118,8 @@ function BannerManagement() {
       toastMsg("error", "Please fill all fields");
       return;
     }
+
+    setSavingBanner(true);
 
     const payload = {
       title: form.title,
@@ -138,6 +157,8 @@ function BannerManagement() {
     } catch (err) {
       console.log(err);
       toastMsg("error", "Server error");
+    } finally {
+      setSavingBanner(false);
     }
   }
 
@@ -147,6 +168,7 @@ function BannerManagement() {
 
   async function doDelete() {
     const id = confirmDelete.id;
+    setDeletingLoadingId(id);
     setConfirmDelete({ show: false, id: null });
 
     try {
@@ -165,24 +187,26 @@ function BannerManagement() {
     } catch (err) {
       console.log(err);
       toastMsg("error", "Error deleting banner");
+    } finally {
+      setDeletingLoadingId(null);
     }
   }
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
       </div>
     );
   }
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-8">
-        <h2 className="text-3xl font-bold text-gray-800">Banners</h2>
+    <div className="p-6 bg-white min-h-screen">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+        <h2 className="text-3xl font-bold text-gray-900">Banners</h2>
         <button
           onClick={openAddModal}
-          className="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+          className="px-6 py-3 bg-gradient-to-r from-blue-500 to-orange-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 self-start sm:self-auto"
         >
           Add New Banner
         </button>
@@ -192,9 +216,9 @@ function BannerManagement() {
         {banners.map((b) => (
           <div
             key={b._id}
-            className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-200 group"
+            className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-200 group border border-gray-100"
           >
-            <div className="relative h-48 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
+            <div className="relative h-48 overflow-hidden bg-gradient-to-br from-blue-50 to-orange-50">
               <img
                 src={b.desktopBanner}
                 alt={b.title}
@@ -206,19 +230,35 @@ function BannerManagement() {
             </div>
 
             <div className="p-5">
-              <h3 className="font-bold text-gray-800 mb-3 text-lg truncate">{b.title}</h3>
+              <h3 className="font-bold text-gray-900 mb-3 text-lg truncate">{b.title}</h3>
               <div className="flex gap-3">
                 <button
                   onClick={() => openEditModal(b)}
-                  className="flex-1 py-2 px-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-200"
+                  disabled={editingLoadingId === b._id || deletingLoadingId === b._id}
+                  className="flex-1 py-2 px-4 bg-gradient-to-r from-blue-500 to-orange-500 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  Edit
+                  {editingLoadingId === b._id ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+                      <span>Loading...</span>
+                    </>
+                  ) : (
+                    "Edit"
+                  )}
                 </button>
                 <button
                   onClick={() => confirmDeleteBanner(b._id)}
-                  className="flex-1 py-2 px-4 bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-200"
+                  disabled={editingLoadingId === b._id || deletingLoadingId === b._id}
+                  className="flex-1 py-2 px-4 bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  Delete
+                  {deletingLoadingId === b._id ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+                      <span>Deleting...</span>
+                    </>
+                  ) : (
+                    "Delete"
+                  )}
                 </button>
               </div>
             </div>
@@ -226,18 +266,16 @@ function BannerManagement() {
         ))}
       </div>
 
-      {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 px-4">
+        <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 px-4" >
           <div
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setShowModal(false)}
           />
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto z-10 relative">
-            {/* Header */}
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto z-10 relative border border-gray-100" style={{scrollbarWidth:'none'}}>
             <div className="sticky top-0 bg-white border-b border-gray-100 p-6 rounded-t-3xl">
               <div className="flex items-center justify-between">
-                <h3 className="text-2xl font-bold text-gray-800">
+                <h3 className="text-2xl font-bold text-gray-900">
                   {editingBanner ? "Edit Banner" : "Add Banner"}
                 </h3>
                 <button
@@ -251,9 +289,7 @@ function BannerManagement() {
               </div>
             </div>
 
-            {/* Content */}
             <div className="p-6 space-y-6">
-              {/* Title */}
               <div>
                 <label className="block mb-2 font-semibold text-gray-700">Title *</label>
                 <input
@@ -264,7 +300,6 @@ function BannerManagement() {
                 />
               </div>
 
-              {/* Desktop Banner */}
               <div>
                 <label className="block mb-2 font-semibold text-gray-700">Desktop Banner *</label>
                 <input
@@ -276,13 +311,13 @@ function BannerManagement() {
                 />
                 <button
                   onClick={() => fileDesktopRef.current.click()}
-                  disabled={uploadLoading}
-                  className="w-full py-3 px-4 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors mb-3"
+                  disabled={desktopUploadLoading}
+                  className="w-full py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors mb-3 border border-gray-200 flex items-center justify-center gap-2"
                 >
-                  {uploadLoading ? (
+                  {desktopUploadLoading ? (
                     <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-700 mr-2 inline-block"></div>
-                      Uploading...
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-700"></div>
+                      <span>Uploading...</span>
                     </>
                   ) : (
                     "Choose Desktop Image"
@@ -299,7 +334,6 @@ function BannerManagement() {
                 )}
               </div>
 
-              {/* Mobile Banner */}
               <div>
                 <label className="block mb-2 font-semibold text-gray-700">Mobile Banner *</label>
                 <input
@@ -311,13 +345,13 @@ function BannerManagement() {
                 />
                 <button
                   onClick={() => fileMobileRef.current.click()}
-                  disabled={uploadLoading}
-                  className="w-full py-3 px-4 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors mb-3"
+                  disabled={mobileUploadLoading}
+                  className="w-full py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors mb-3 border border-gray-200 flex items-center justify-center gap-2"
                 >
-                  {uploadLoading ? (
+                  {mobileUploadLoading ? (
                     <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-700 mr-2 inline-block"></div>
-                      Uploading...
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-700"></div>
+                      <span>Uploading...</span>
                     </>
                   ) : (
                     "Choose Mobile Image"
@@ -335,35 +369,41 @@ function BannerManagement() {
               </div>
             </div>
 
-            {/* Footer Actions */}
             <div className="sticky bottom-0 bg-white border-t border-gray-100 p-6 rounded-b-3xl flex justify-end gap-3">
               <button
-                className="px-6 py-3 bg-gray-300 text-gray-700 rounded-xl hover:bg-gray-400 transition-colors"
+                className="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors border border-gray-200"
                 onClick={() => setShowModal(false)}
               >
                 Cancel
               </button>
               <button
-                className="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                className="px-6 py-3 bg-gradient-to-r from-blue-500 to-orange-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 onClick={handleSave}
+                disabled={savingBanner}
               >
-                Save Banner
+                {savingBanner ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+                    <span>Saving...</span>
+                  </>
+                ) : (
+                  "Save Banner"
+                )}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Delete Confirmation */}
       {confirmDelete.show && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50" />
-          <div className="bg-white rounded-2xl shadow-xl p-6 z-10 w-full max-w-md">
-            <h3 className="text-lg font-semibold mb-4 text-gray-800">Delete Banner?</h3>
+          <div className="bg-white rounded-2xl shadow-xl p-6 z-10 w-full max-w-md border border-gray-100">
+            <h3 className="text-lg font-semibold mb-4 text-gray-900">Delete Banner?</h3>
             <p className="text-gray-600 mb-6">This action cannot be undone.</p>
             <div className="flex justify-end gap-3">
               <button
-                className="px-4 py-2 bg-gray-300 rounded-xl hover:bg-gray-400 transition-colors"
+                className="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300 transition-colors border border-gray-200"
                 onClick={() => setConfirmDelete({ show: false, id: null })}
               >
                 Cancel

@@ -2,15 +2,16 @@ import { useToast } from "../Providers/ToastProvider";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useRef } from "react";
 import Allapi from "../common";
+import logotext from "../assets/logotext.png";
 
 function GoogleCallback() {
   const toastMsg = useToast();
   const navigate = useNavigate();
   const location = useLocation();
-  const calledRef = useRef(false); // 🔥 Prevent double effect call
+  const calledRef = useRef(false);
 
   useEffect(() => {
-    if (calledRef.current) return;  // skip second StrictMode call
+    if (calledRef.current) return;
     calledRef.current = true;
 
     const code = new URLSearchParams(location.search).get("code");
@@ -32,10 +33,23 @@ function GoogleCallback() {
           return navigate("/login", { replace: true });
         }
 
-localStorage.setItem("token", data.token);
-localStorage.setItem("userdetails", JSON.stringify(data.user));
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("userdetails", JSON.stringify(data.user));
+        localStorage.setItem("role", data.user.role);
         toastMsg("success", data.message);
-        navigate(data.user.role === "admin" ? "/admin" : "/user", { replace: true });
+
+        // 🔥 Read redirect URL from localStorage (set by LoginPage)
+        const redirectFromStorage = localStorage.getItem("redirectAfterLogin");
+        localStorage.removeItem("redirectAfterLogin");
+
+
+      const redirectTo = 
+          data.user.role === "admin"
+            ? "/admin"
+            : redirectFromStorage || "/";
+
+        console.log("Redirecting to:", redirectTo);
+        navigate(redirectTo, { replace: true });
       })
       .catch(() => {
         toastMsg("error", "Authentication error");
@@ -44,7 +58,9 @@ localStorage.setItem("userdetails", JSON.stringify(data.user));
   }, []);
 
   return (
-    <div className="w-full h-screen flex items-center justify-center bg-gray-100">
+    <div className="w-full h-screen flex flex-col items-center justify-center bg-gradient-to-b from-white to-blue-50">
+      <img src={logotext} alt="PrintMaania" className="h-40 w-auto mb-4" />
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
       <h2 className="text-lg font-semibold text-gray-700">Logging in with Google...</h2>
     </div>
   );

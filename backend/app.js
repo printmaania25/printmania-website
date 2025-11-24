@@ -8,7 +8,9 @@ import orderRoutes from "./routes/order_routes.js";
 import bannerRoutes from "./routes/banner_routes.js";
 import cookieParser from "cookie-parser";
 import {database} from "./config/database.js"
+import quoteRoutes from "./routes/quote_routes.js";
 import userRoutes from "./routes/user_routes.js";
+import offerRoutes from "./routes/offerRoutes.js";
 
 dotenv.config();
 
@@ -31,6 +33,8 @@ app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/banners", bannerRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/quotes", quoteRoutes);
+app.use("/api/offers",offerRoutes);
 app.get("/ping", (req, res) => {
   res.status(200).send("pong");
 });

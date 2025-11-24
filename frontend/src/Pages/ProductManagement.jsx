@@ -1,3 +1,4 @@
+// ProductManagement.jsx
 import { useEffect, useState, useRef } from "react";
 import { useToast } from "../Providers/ToastProvider";
 import Allapi from "../common";
@@ -297,18 +298,18 @@ function ProductManagement() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
       </div>
     );
   }
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-3xl font-bold text-gray-800">Products</h2>
+    <div className="p-6 bg-white min-h-screen">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+        <h2 className="text-3xl font-bold text-gray-900">Products</h2>
         <button
           onClick={openAddModal}
-          className="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all"
+          className="px-6 py-3 bg-gradient-to-r from-blue-500 to-orange-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all self-start sm:self-auto"
         >
           Add New Product
         </button>
@@ -320,7 +321,7 @@ function ProductManagement() {
           {paginatedProducts.map((p) => (
             <div
               key={p._id}
-              className="bg-white rounded-2xl shadow-md overflow-hidden cursor-pointer hover:shadow-xl transition-shadow duration-200"
+              className="bg-white rounded-2xl shadow-md overflow-hidden cursor-pointer hover:shadow-xl transition-shadow duration-200 border border-gray-100"
               onClick={() => openViewModal(p)}
             >
               {/* Images Section - Horizontal Scroll if Multiple */}
@@ -348,8 +349,8 @@ function ProductManagement() {
                       </div>
                     ))
                   ) : (
-                    <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                      <span className="text-gray-400">No Image</span>
+                    <div className="w-full h-full bg-blue-50 flex items-center justify-center">
+                      <span className="text-blue-400">No Image</span>
                     </div>
                   )}
                 </div>
@@ -357,7 +358,7 @@ function ProductManagement() {
 
               {/* Product Info */}
               <div className="p-4">
-                <h3 className="font-semibold text-gray-800 mb-2 text-sm leading-tight">
+                <h3 className="font-semibold text-gray-900 mb-2 text-sm leading-tight">
                   {p.name}
                 </h3>
                 <p className="text-gray-600 text-xs mb-2 capitalize">{p.category}</p>
@@ -368,7 +369,7 @@ function ProductManagement() {
                   </div>
                   <div>
                     <div className="text-xs text-gray-400">Price</div>
-                    <div className="font-semibold text-green-600">₹{p.price}</div>
+                    <div className="font-semibold text-blue-600">₹{p.price}</div>
                   </div>
                 </div>
 
@@ -399,10 +400,10 @@ function ProductManagement() {
             <button
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="p-2 bg-white rounded-full shadow-md hover:shadow-lg disabled:opacity-50 transition-shadow"
+              className="p-2 bg-white rounded-full shadow-md hover:shadow-lg disabled:opacity-50 transition-shadow border border-gray-200"
             >
               <svg
-                className="w-5 h-5 text-gray-600"
+                className="w-5 h-5 text-blue-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -423,10 +424,10 @@ function ProductManagement() {
             <button
               onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages}
-              className="p-2 bg-white rounded-full shadow-md hover:shadow-lg disabled:opacity-50 transition-shadow"
+              className="p-2 bg-white rounded-full shadow-md hover:shadow-lg disabled:opacity-50 transition-shadow border border-gray-200"
             >
               <svg
-                className="w-5 h-5 text-gray-600"
+                className="w-5 h-5 text-blue-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -448,16 +449,16 @@ function ProductManagement() {
         <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 px-4">
           <div
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={closeModal}
+            onClick={() => setShowModal(false)}
           />
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto z-10 relative">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto z-10 relative border border-gray-100" style={{scrollbarWidth:'none'}}>
             {/* Header */}
             <div className="sticky top-0 bg-white border-b border-gray-100 p-6 rounded-t-3xl">
               <div className="flex items-center justify-between">
-                <h3 className="text-2xl font-bold text-gray-800">
-                  {viewingProduct ? (isEditing ? "Edit Product" : "Product Details") : "Add Product"}
+                <h3 className="text-2xl font-bold text-gray-900">
+                  {viewingProduct ? (isEditing ? "Edit Product" : "View Product") : "Add Product"}
                 </h3>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
                   {viewingProduct && !isEditing && (
                     <button
                       onClick={enableEdit}
@@ -488,7 +489,7 @@ function ProductManagement() {
                     Product Name {isEditing || !viewingProduct ? "*" : ""}
                   </label>
                   <input
-                    className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed"
+                    className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed transition-all"
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
                     disabled={!isEditing && viewingProduct}
@@ -500,7 +501,7 @@ function ProductManagement() {
                     Category {isEditing || !viewingProduct ? "*" : ""}
                   </label>
                   <select
-                    className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed"
+                    className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed transition-all"
                     value={form.category}
                     onChange={(e) => setForm({ ...form, category: e.target.value })}
                     disabled={!isEditing && viewingProduct}
@@ -520,7 +521,7 @@ function ProductManagement() {
                   </label>
                   <input
                     type="number"
-                    className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed"
+                    className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed transition-all"
                     value={form.mrp}
                     onChange={(e) => setForm({ ...form, mrp: e.target.value })}
                     disabled={!isEditing && viewingProduct}
@@ -533,7 +534,7 @@ function ProductManagement() {
                   </label>
                   <input
                     type="number"
-                    className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed"
+                    className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed transition-all"
                     value={form.price}
                     onChange={(e) => setForm({ ...form, price: e.target.value })}
                     disabled={!isEditing && viewingProduct}
@@ -553,7 +554,7 @@ function ProductManagement() {
                           checked={form.phrases.includes(phrase)}
                           onChange={() => togglePhrase(phrase)}
                           disabled={!isEditing && viewingProduct}
-                          className="rounded"
+                          className="rounded border-blue-300"
                         />
                         <span className="text-sm text-gray-700">{phrase}</span>
                       </label>
@@ -564,7 +565,7 @@ function ProductManagement() {
                       {form.phrases.map((phrase, idx) => (
                         <span
                           key={idx}
-                          className="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs"
+                          className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs"
                         >
                           {phrase}
                         </span>
@@ -576,9 +577,9 @@ function ProductManagement() {
                 {/* Sizes */}
                 <div className="md:col-span-2">
                   <label className="block mb-2 font-semibold text-gray-700">Sizes</label>
-                  <div className="flex gap-2 mb-3">
+                  <div className="flex gap-2 mb-3 flex-col sm:flex-row">
                     <input
-                      className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all"
                       value={newSize}
                       onChange={(e) => setNewSize(e.target.value)}
                       placeholder="Enter size (e.g., S, M, L)"
@@ -618,7 +619,7 @@ function ProductManagement() {
                   <div
                     className={`relative inline-block w-12 h-6 rounded-full transition-colors ${
                       form.uploadrequired
-                        ? "bg-green-600"
+                        ? "bg-blue-600"
                         : "bg-gray-300"
                     } ${(!isEditing && viewingProduct) ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
                     onClick={() => {
@@ -640,7 +641,7 @@ function ProductManagement() {
                   <label className="block mb-2 font-semibold text-gray-700">
                     Pictures {isEditing || !viewingProduct ? "*" : ""}
                   </label>
-                  <div className="flex gap-2 items-center mb-3">
+                  <div className="flex gap-2 items-center mb-3 flex-col sm:flex-row">
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -653,7 +654,7 @@ function ProductManagement() {
                     <button
                       onClick={() => fileInputRef.current?.click()}
                       disabled={!isEditing && viewingProduct}
-                      className="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors border border-gray-200"
                     >
                       Choose Images
                     </button>
@@ -670,9 +671,9 @@ function ProductManagement() {
                         <img
                           src={url}
                           alt={`img-${idx}`}
-                          className="w-full h-24 object-cover rounded-xl"
+                          className="w-full h-24 object-cover rounded-xl border border-gray-100"
                         />
-                        {(!isEditing || viewingProduct) ? null : (
+                        {!isEditing ? null : (
                           <button
                             onClick={() => removePictureAt(idx)}
                             className="absolute -top-1 -right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
@@ -691,7 +692,7 @@ function ProductManagement() {
             <div className="sticky bottom-0 bg-white border-t border-gray-100 p-6 rounded-b-3xl flex justify-end gap-3">
               <button
                 onClick={closeModal}
-                className="px-6 py-3 bg-gray-300 text-gray-700 rounded-xl hover:bg-gray-400 transition-colors"
+                className="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors border border-gray-200"
               >
                 {isEditing ? "Cancel" : "Close"}
               </button>
@@ -699,7 +700,7 @@ function ProductManagement() {
                 <button
                   onClick={handleSave}
                   disabled={saveLoading}
-                  className="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl disabled:opacity-50 transition-all disabled:cursor-not-allowed"
+                  className="px-6 py-3 bg-gradient-to-r from-blue-500 to-orange-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl disabled:opacity-50 transition-all disabled:cursor-not-allowed"
                 >
                   {saveLoading ? (
                     <>
@@ -722,12 +723,12 @@ function ProductManagement() {
       {confirmDelete.show && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50" />
-          <div className="bg-white rounded-2xl shadow-xl p-6 z-10 w-full max-w-md">
-            <h3 className="text-lg font-semibold mb-4 text-gray-800">Delete Product?</h3>
+          <div className="bg-white rounded-2xl shadow-xl p-6 z-10 w-full max-w-md border border-gray-100">
+            <h3 className="text-lg font-semibold mb-4 text-gray-900">Delete Product?</h3>
             <p className="text-gray-600 mb-6">This action cannot be undone.</p>
             <div className="flex justify-end gap-3">
               <button
-                className="px-4 py-2 bg-gray-300 rounded-xl hover:bg-gray-400 transition-colors"
+                className="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300 transition-colors border border-gray-200"
                 onClick={() => setConfirmDelete({ show: false, id: null })}
               >
                 Cancel

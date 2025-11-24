@@ -1,3 +1,25 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Hide scrollbars everywhere */
+html, body {
+  overflow-y: auto;
+  overflow-x: auto;  /* IMPORTANT */
+}
+
+/* For WebKit browsers (Chrome, Safari) */
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* For Firefox */
+html {
+  scrollbar-width: none;
+}
+
+/* For IE & Edge Legacy */
+body {
+  -ms-overflow-style: none;
+}

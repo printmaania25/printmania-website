@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useUser from "../hooks/useUser";
@@ -13,6 +12,7 @@ function AddressesPage() {
   const [editingId, setEditingId] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const initialForm = {
     name: "",
     mobile: "",
@@ -45,55 +45,63 @@ function AddressesPage() {
   }, []);
 
   const handleSubmit = async () => {
+    if (saving) return;
     // Validation
     if (!form.name || !form.mobile || !form.doorNo || !form.street || !form.city || !form.pincode || !form.state) {
       toastMsg("error", "Please fill all fields");
       return;
     }
 
-    if (editingId) {
-      // Update address
-      const res = await fetch(Allapi.address.update.url(editingId), {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(form)
-      });
+    setSaving(true);
+    try {
+      if (editingId) {
+        // Update address
+        const res = await fetch(Allapi.address.update.url(editingId), {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify(form)
+        });
 
-      const data = await res.json();
+        const data = await res.json();
 
-      if (data.success) {
-        toastMsg("success", "Address updated");
-        setEditingId(null);
-        setForm(initialForm);
-        setShowForm(false);
-        fetchAddresses();
+        if (data.success) {
+          toastMsg("success", "Address updated");
+          setEditingId(null);
+          setForm(initialForm);
+          setShowForm(false);
+          fetchAddresses();
+        } else {
+          toastMsg("error", data.message);
+        }
       } else {
-        toastMsg("error", data.message);
-      }
-    } else {
-      // Create address
-      const res = await fetch(Allapi.address.create.url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(form)
-      });
+        // Create address
+        const res = await fetch(Allapi.address.create.url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify(form)
+        });
 
-      const data = await res.json();
+        const data = await res.json();
 
-      if (data.success) {
-        toastMsg("success", "Address added");
-        setForm(initialForm);
-        setShowForm(false);
-        fetchAddresses();
-      } else {
-        toastMsg("error", data.message);
+        if (data.success) {
+          toastMsg("success", "Address added");
+          setForm(initialForm);
+          setShowForm(false);
+          fetchAddresses();
+        } else {
+          toastMsg("error", data.message);
+        }
       }
+    } catch (err) {
+      toastMsg("error", "Failed to save address");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -109,6 +117,8 @@ function AddressesPage() {
     });
     setEditingId(addr._id);
     setShowForm(true);
+    // Scroll to top when edit is clicked
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const cancelEdit = () => {
@@ -134,22 +144,22 @@ function AddressesPage() {
 
   if (loading) {
     return (
-      <div className="w-full h-screen bg-gradient-to-br from-purple-50 to-white flex items-center justify-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-600"></div>
+      <div className="w-full h-screen bg-gradient-to-br from-blue-50 to-orange-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
       </div>
     );
   }
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-b from-white to-purple-50 pt-16">
+    <div className="w-full min-h-screen bg-gradient-to-b from-white to-blue-50 pt-16">
               <div className="w-full h-16 bg-white flex items-center px-4 md:px-8">
         <button
           onClick={() => navigate(-1)}
-          className="w-10 h-10 rounded-full bg-purple-100 hover:bg-purple-200 flex items-center justify-center transition-colors duration-300"
+          className="w-10 h-10 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-colors duration-300"
         >
-          <span className="text-purple-600 text-xl font-bold">←</span>
+          <span className="text-blue-600 text-xl font-bold">←</span>
         </button>
-        <h1 className="ml-4 text-lg font-bold text-gray-800">Back</h1>
+        <h1 className="ml-4 text-lg font-bold text-gray-800">Addresses</h1>
       </div>
       <div className="pb-8">
         <div className="max-w-4xl mx-auto px-4 md:px-8 py-8">
@@ -158,7 +168,7 @@ function AddressesPage() {
           {!showForm && (
             <button
               onClick={() => setShowForm(true)}
-              className="w-full mb-6 py-4 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white rounded-2xl text-lg font-bold shadow-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2"
+              className="w-full mb-6 py-4 bg-gradient-to-r from-blue-500 to-orange-500 hover:from-blue-600 hover:to-orange-600 text-white rounded-2xl text-lg font-bold shadow-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -180,7 +190,7 @@ function AddressesPage() {
                   <input
                     type="text"
                     placeholder="Enter your full name"
-                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-400 transition-colors"
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-400 transition-colors"
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
                   />
@@ -191,7 +201,7 @@ function AddressesPage() {
                   <input
                     type="tel"
                     placeholder="Enter 10-digit mobile number"
-                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-400 transition-colors"
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-400 transition-colors"
                     value={form.mobile}
                     onChange={(e) => setForm({ ...form, mobile: e.target.value })}
                   />
@@ -203,7 +213,7 @@ function AddressesPage() {
                     <input
                       type="text"
                       placeholder="House/Flat/Building No."
-                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-400 transition-colors"
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-400 transition-colors"
                       value={form.doorNo}
                       onChange={(e) => setForm({ ...form, doorNo: e.target.value })}
                     />
@@ -214,7 +224,7 @@ function AddressesPage() {
                     <input
                       type="text"
                       placeholder="Street/Road/Area"
-                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-400 transition-colors"
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-400 transition-colors"
                       value={form.street}
                       onChange={(e) => setForm({ ...form, street: e.target.value })}
                     />
@@ -227,7 +237,7 @@ function AddressesPage() {
                     <input
                       type="text"
                       placeholder="City"
-                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-400 transition-colors"
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-400 transition-colors"
                       value={form.city}
                       onChange={(e) => setForm({ ...form, city: e.target.value })}
                     />
@@ -238,7 +248,7 @@ function AddressesPage() {
                     <input
                       type="text"
                       placeholder="6-digit Pincode"
-                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-400 transition-colors"
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-400 transition-colors"
                       value={form.pincode}
                       onChange={(e) => setForm({ ...form, pincode: e.target.value })}
                     />
@@ -250,7 +260,7 @@ function AddressesPage() {
                   <input
                     type="text"
                     placeholder="State"
-                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-400 transition-colors"
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-400 transition-colors"
                     value={form.state}
                     onChange={(e) => setForm({ ...form, state: e.target.value })}
                   />
@@ -259,10 +269,18 @@ function AddressesPage() {
 
               <div className="flex gap-4 mt-6">
                 <button
-                  className="flex-1 py-3 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white rounded-xl font-bold transition-all duration-300 transform hover:scale-105"
+                  className="flex-1 py-3 bg-gradient-to-r from-blue-500 to-orange-500 hover:from-blue-600 hover:to-orange-600 text-white rounded-xl font-bold transition-all duration-300 transform hover:scale-105 disabled:opacity-50"
                   onClick={handleSubmit}
+                  disabled={saving}
                 >
-                  {editingId ? "Update Address" : "Save Address"}
+                  {saving ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white mr-2 inline-block"></div>
+                      Saving...
+                    </>
+                  ) : (
+                    editingId ? "Update Address" : "Save Address"
+                  )}
                 </button>
                 <button
                   className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl font-semibold transition-colors"
@@ -289,7 +307,7 @@ function AddressesPage() {
                 {!showForm && (
                   <button
                     onClick={() => setShowForm(true)}
-                    className="px-6 py-3 bg-purple-600 text-white rounded-full font-semibold hover:bg-purple-700 transition-colors"
+                    className="px-6 py-3 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition-colors"
                   >
                     Add Address
                   </button>
@@ -302,20 +320,20 @@ function AddressesPage() {
                     <div className="p-6">
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
-                            <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
                           </div>
                           <div>
                             <p className="font-bold text-lg text-gray-900">{addr.name}</p>
-                            <p className="text-purple-600 font-semibold">{addr.mobile}</p>
+                            <p className="text-blue-600 font-semibold">{addr.mobile}</p>
                           </div>
                         </div>
                       </div>
 
-                      <div className="bg-purple-50 rounded-xl p-4 mb-4">
+                      <div className="bg-blue-50 rounded-xl p-4 mb-4">
                         <p className="text-gray-700 leading-relaxed">
                           {addr.doorNo}, {addr.street},<br />
                           {addr.city}, {addr.state}<br />
@@ -325,7 +343,7 @@ function AddressesPage() {
 
                       <div className="flex gap-3">
                         <button
-                          className="flex-1 py-2.5 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2"
+                          className="flex-1 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2"
                           onClick={() => editAddress(addr)}
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

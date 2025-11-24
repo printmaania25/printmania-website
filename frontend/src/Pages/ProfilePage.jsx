@@ -10,14 +10,17 @@ function ProfilePage() {
     const navigate = useNavigate();
 
   const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const [name, setName] = useState(user?.name || "");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  if (!user) return <div className="p-6 min-h-screen bg-gray-50 pt-16">Not logged in</div>;
+  if (!user) return <div className="p-6 min-h-screen bg-gradient-to-b from-white to-blue-50 pt-16">Not logged in</div>;
 
   const handleSave = async () => {
+    if (saving) return;
+    console.log("name:",name);
     if (password && password !== confirmPassword) {
       toastMsg("error", "Passwords do not match");
       return;
@@ -32,6 +35,7 @@ function ProfilePage() {
       return;
     }
 
+    setSaving(true);
     try {
       const res = await fetch(Allapi.user.update.url, {
         method: Allapi.user.update.method,
@@ -43,13 +47,13 @@ function ProfilePage() {
       });
 
       const data = await res.json();
-
+      console.log("update date",data)
       if (!data.success) {
         toastMsg("error", data.message || "Update failed");
         return;
       }
 
-      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("userdetails", JSON.stringify(data.user));
 
       toastMsg("success", "Profile updated");
 
@@ -60,17 +64,19 @@ function ProfilePage() {
       window.location.reload();
     } catch (err) {
       toastMsg("error", "Error updating profile");
+    } finally {
+      setSaving(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 pt-20">
+    <div className="min-h-screen bg-gradient-to-b from-white to-blue-50 p-6 pt-20">
         <div className="w-full h-16 flex items-center px-4 md:px-8">
         <button
           onClick={() => navigate("/")}
-          className="w-10 h-10 rounded-full bg-purple-100 hover:bg-purple-200 flex items-center justify-center transition-colors duration-300"
+          className="w-10 h-10 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-colors duration-300"
         >
-          <span className="text-purple-600 text-xl font-bold">←</span>
+          <span className="text-blue-600 text-xl font-bold">←</span>
         </button>
         <h1 className="ml-4 text-lg font-bold text-gray-800">Back</h1>
       </div>
@@ -79,7 +85,7 @@ function ProfilePage() {
 
         <div className="bg-white shadow-xl rounded-2xl p-6 border border-gray-100">
           <div className="flex flex-col items-center mb-6">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center mb-3 shadow-lg">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-r from-blue-500 to-orange-500 flex items-center justify-center mb-3 shadow-lg">
               <span className="text-white font-bold text-xl">
                 {user.name?.[0]?.toUpperCase() || 'U'}
               </span>
@@ -103,7 +109,7 @@ function ProfilePage() {
                 </div>
 
                 <div className="flex items-center gap-3 py-3 px-4 bg-gray-50 rounded-xl">
-                  <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                  <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
                     <span className="text-white text-xs font-bold">N</span>
                   </div>
                   <div>
@@ -114,7 +120,7 @@ function ProfilePage() {
               </div>
 
               <button
-                className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-orange-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
                 onClick={() => setEditing(true)}
               >
                 Edit Profile
@@ -157,10 +163,18 @@ function ProfilePage() {
 
               <div className="flex gap-3">
                 <button
-                  className="flex-1 py-3 px-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="flex-1 py-3 px-4 bg-gradient-to-r from-blue-500 to-orange-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50"
                   onClick={handleSave}
+                  disabled={saving}
                 >
-                  Save Changes
+                  {saving ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white mr-2 inline-block"></div>
+                      Saving...
+                    </>
+                  ) : (
+                    'Save Changes'
+                  )}
                 </button>
 
                 <button

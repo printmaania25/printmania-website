@@ -42,7 +42,11 @@ const orderSchema = new mongoose.Schema(
     transactionscreenshot: [{ type: String }], // image URL array
 
     cancelled: { type: Boolean, default: false },
-    delivered: { type: Boolean, default: false }
+    delivered: { type: Boolean, default: false },
+
+    cod: { type: Boolean, default: false },
+
+    trackingId: { type: String, default: "" }
 
   },
   { timestamps: true }

@@ -17,6 +17,7 @@ function Product() {
   const [uploadImage, setUploadImage] = useState("");
   const [loading, setLoading] = useState(true);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [placingOrder, setPlacingOrder] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedAddressIndex, setSelectedAddressIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -104,6 +105,8 @@ function Product() {
   };
 
   const placeOrder = async () => {
+    if (placingOrder) return;
+
     if (!addresses.length) {
       alert("Please add an address before ordering");
       return navigate("/addresses");
@@ -116,46 +119,59 @@ function Product() {
     const payload = {
       productId: product._id,
       size: selectedSize,
-      price: product.price ,
+      price: product.price,
       quantity,
       address: addresses[selectedAddressIndex],
     };
-    console.log("payload: ",payload);
+  
     if (product.uploadrequired) {
       if (!uploadImage) return alert("Please upload required image");
       payload.uploaded = uploadImage;
     }
 
-    const res = await fetch(Allapi.orders.create.url, {
-      method: Allapi.orders.create.method,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify(payload)
-    });
+    console.log("payload: ", payload);
 
-    const data = await res.json();
-    if (!data.success) return alert(data.message);
+    try {
+      setPlacingOrder(true);
+      const res = await fetch(Allapi.orders.create.url, {
+        method: Allapi.orders.create.method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
 
-    navigate(`/order/${data.order._id}`);
+      const data = await res.json();
+      if (!data.success) {
+        alert(data.message);
+        return;
+      }
+
+      navigate(`/order/${data.order._id}`);
+    } catch (error) {
+      console.error(error);
+      alert("Failed to place order. Please try again.");
+    } finally {
+      setPlacingOrder(false);
+    }
   };
 
   if (loading) {
     return (
-      <div className="w-full h-screen bg-gradient-to-br from-purple-50 to-white flex items-center justify-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-600"></div>
+      <div className="w-full h-screen bg-gradient-to-br from-blue-50 to-orange-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
       </div>
     );
   }
 
   if (!product) {
     return (
-      <div className="w-full h-screen bg-gradient-to-br from-purple-50 to-white flex flex-col items-center justify-center">
+      <div className="w-full h-screen bg-gradient-to-br from-blue-50 to-orange-50 flex flex-col items-center justify-center">
         <p className="text-xl text-gray-600 mb-4">Product not found</p>
         <button
           onClick={() => navigate("/")}
-          className="px-6 py-3 bg-purple-600 text-white rounded-full font-semibold hover:bg-purple-700 transition-colors"
+          className="px-6 py-3 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition-colors"
         >
           Go Home
         </button>
@@ -163,18 +179,20 @@ function Product() {
     );
   }
 
+  console.log("product:",product)
+
   return (
-    <div className="w-full min-h-screen bg-gradient-to-b from-white to-purple-50 pt-16">
+    <div className="w-full min-h-screen bg-gradient-to-b from-white to-blue-50 pt-16">
       {/* Header with Back Button */}
          <Navbar />
 
       <div className="pb-24">
         <div className="w-full h-16 bg-white  flex items-center px-4 md:px-8">
           <button
-            onClick={() => navigate(-1)}
-            className="w-10 h-10 rounded-full bg-purple-100 hover:bg-purple-200 flex items-center justify-center transition-colors duration-300"
+            onClick={() => navigate("/")}
+            className="w-10 h-10 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-colors duration-300"
           >
-            <span className="text-purple-600 text-xl font-bold">←</span>
+            <span className="text-blue-600 text-xl font-bold">←</span>
           </button>
           <h1 className="ml-4 text-lg font-bold text-gray-800">Product Details</h1>
         </div>
@@ -222,7 +240,7 @@ function Product() {
                             key={idx}
                             onClick={() => goToImage(idx)}
                             className={`h-2 rounded-full transition-all duration-300 ${
-                              idx === currentImageIndex ? 'bg-purple-600 w-8' : 'bg-gray-400 w-2'
+                              idx === currentImageIndex ? 'bg-blue-500 w-8' : 'bg-gray-400 w-2'
                             }`}
                           />
                         ))}
@@ -238,11 +256,21 @@ function Product() {
               {/* Product Info Card */}
               <div className="bg-white rounded-2xl shadow-lg p-6">
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">{product.name}</h2>
-                <p className="text-purple-600 font-semibold text-sm uppercase tracking-wide mb-4">
+                <p className="text-blue-600 font-semibold text-sm uppercase tracking-wide mb-4">
                   {product.category}
                 </p>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-4xl font-bold text-gray-900">₹{product.price}</span>
+                  <div className="flex items-end gap-3">
+                      {/* Discounted price */}
+                      <span className="text-4xl font-bold text-gray-900">
+                        ₹{product.price}
+                      </span>
+
+                      {/* MRP Striked */}
+                      <span className="text-2xl font-semibold text-gray-500 line-through">
+                        ₹{product.mrp}
+                      </span>
+                    </div>
                 </div>
               </div>
 
@@ -257,8 +285,8 @@ function Product() {
                         onClick={() => setSelectedSize(s)}
                         className={`px-6 py-3 border-2 rounded-xl font-semibold transition-all duration-300 ${
                           selectedSize === s
-                            ? "bg-purple-600 text-white border-purple-600 shadow-lg scale-105"
-                            : "border-gray-300 text-gray-700 hover:border-purple-400 hover:text-purple-600"
+                            ? "bg-blue-600 text-white border-blue-600 shadow-lg scale-105"
+                            : "border-gray-300 text-gray-700 hover:border-blue-400 hover:text-blue-600"
                         }`}
                       >
                         {s}
@@ -274,20 +302,20 @@ function Product() {
                 <div className="flex items-center gap-4">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="w-12 h-12 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-600 font-bold text-xl transition-colors duration-300"
+                    className="w-12 h-12 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 font-bold text-xl transition-colors duration-300"
                   >
                     −
                   </button>
                   <input
                     type="number"
-                    className="w-20 text-center text-2xl font-bold text-gray-800 border-2 border-gray-300 rounded-xl py-2 focus:outline-none focus:border-purple-400"
+                    className="w-20 text-center text-2xl font-bold text-gray-800 border-2 border-gray-300 rounded-xl py-2 focus:outline-none focus:border-blue-400"
                     min={1}
                     value={quantity}
                     onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
                   />
                   <button
                     onClick={() => setQuantity(quantity + 1)}
-                    className="w-12 h-12 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-600 font-bold text-xl transition-colors duration-300"
+                    className="w-12 h-12 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 font-bold text-xl transition-colors duration-300"
                   >
                     +
                   </button>
@@ -300,34 +328,33 @@ function Product() {
                   <h3 className="font-bold text-gray-800 mb-3 text-lg">Upload Required Image</h3>
                   
                   {uploadingImage ? (
-                    <div className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-purple-300 rounded-xl bg-purple-50">
-                      <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-purple-600 mb-3"></div>
-                      <p className="text-purple-600 font-semibold">Uploading...</p>
+                    <div className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-blue-300 rounded-xl bg-blue-50">
+                      <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-500 mb-3"></div>
+                      <p className="text-blue-600 font-semibold">Uploading...</p>
                     </div>
                   ) : uploadImage ? (
-<div className="flex items-center justify-center py-4">
-  <div className="relative inline-block">
-    <img
-      src={uploadImage}
-      className="max-w-24 max-h-24 rounded-xl border-2 border-purple-200 object-contain"
-      alt="Uploaded"
-    />
-    <button
-      onClick={() => setUploadImage("")}
-      className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-lg transition-colors text-xs"
-    >
-      ✕
-    </button>
-  </div>
-</div>
-
+                    <div className="flex items-center justify-center py-4 min-h-[200px]">
+                      <div className="relative inline-block">
+                        <img
+                          src={uploadImage}
+                          className="w-48 h-48 rounded-xl border-2 border-blue-200 object-contain bg-gray-50"
+                          alt="Uploaded"
+                        />
+                        <button
+                          onClick={() => setUploadImage("")}
+                          className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-lg transition-colors font-bold"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </div>
                   ) : (
-                    <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-purple-300 rounded-xl cursor-pointer bg-purple-50 hover:bg-purple-100 transition-colors duration-300">
+                    <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-blue-300 rounded-xl cursor-pointer bg-blue-50 hover:bg-blue-100 transition-colors duration-300">
                       <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        <svg className="w-12 h-12 mb-3 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-12 h-12 mb-3 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                         </svg>
-                        <p className="mb-2 text-sm text-purple-600 font-semibold">Click to upload image</p>
+                        <p className="mb-2 text-sm text-blue-600 font-semibold">Click to upload image</p>
                         <p className="text-xs text-gray-500">PNG, JPG (MAX. 10MB)</p>
                       </div>
                       <input
@@ -347,7 +374,7 @@ function Product() {
                   <h3 className="font-bold text-gray-800 text-lg">Delivery Address</h3>
                   <button
                     onClick={() => navigate("/addresses")}
-                    className="text-purple-600 hover:text-purple-800 font-semibold text-sm transition-colors"
+                    className="text-blue-600 hover:text-blue-800 font-semibold text-sm transition-colors"
                   >
                     + Add New
                   </button>
@@ -358,27 +385,27 @@ function Product() {
                     <p className="text-gray-500 mb-4">No addresses found</p>
                     <button
                       onClick={() => navigate("/addresses")}
-                      className="px-6 py-3 bg-purple-600 text-white rounded-full font-semibold hover:bg-purple-700 transition-colors"
+                      className="px-6 py-3 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition-colors"
                     >
                       Add Address
                     </button>
                   </div>
                 ) : (
-                  <div className="space-y-3 max-h-64 overflow-y-auto">
+                  <div className="space-y-3 max-h-64 overflow-y-auto" style={{scrollbarWidth:'none'}}>
                     {addresses.map((addr, idx) => (
                       <div
                         key={idx}
                         onClick={() => setSelectedAddressIndex(idx)}
                         className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 ${
                           selectedAddressIndex === idx
-                            ? "border-purple-600 bg-purple-50 shadow-md"
-                            : "border-gray-200 hover:border-purple-300"
+                            ? "border-blue-600 bg-blue-50 shadow-md"
+                            : "border-gray-200 hover:border-blue-300"
                         }`}
                       >
                         <div className="flex items-start">
                           <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 mt-0.5 mr-3 flex items-center justify-center transition-colors ${
                             selectedAddressIndex === idx
-                              ? "border-purple-600 bg-purple-600"
+                              ? "border-blue-600 bg-blue-600"
                               : "border-gray-300"
                           }`}>
                             {selectedAddressIndex === idx && (
@@ -413,9 +440,17 @@ function Product() {
           </div>
           <button
             onClick={placeOrder}
-            className="flex-1 max-w-md py-4 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white rounded-full text-lg font-bold shadow-lg transition-all duration-300 transform hover:scale-105"
+            disabled={placingOrder}
+            className="flex-1 max-w-md py-4 bg-gradient-to-r from-blue-500 to-orange-500 hover:from-blue-600 hover:to-orange-600 text-white rounded-full text-lg font-bold shadow-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3"
           >
-            Place Order
+            {placingOrder ? (
+              <>
+                <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-white"></div>
+                <span>Placing Order...</span>
+              </>
+            ) : (
+              'Place Order'
+            )}
           </button>
         </div>
       </div>
