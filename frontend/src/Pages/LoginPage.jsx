@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useToast } from "../Providers/ToastProvider";
 import Allapi from "../common";
+import { ArrowLeft } from "lucide-react";
 
 function LoginPage() {
   const location = useLocation();
@@ -10,6 +11,7 @@ function LoginPage() {
   const toastMsg = useToast();
 
   const [isSignup, setIsSignup] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // shared fields
   const [email, setEmail] = useState("");
@@ -31,6 +33,8 @@ function LoginPage() {
       toastMsg("error", "Passwords do not match");
       return;
     }
+
+    setIsLoading(true);
 
     try {
       const res = await fetch(Allapi.auth.register.url, {
@@ -60,11 +64,15 @@ function LoginPage() {
     } catch (err) {
       console.error(err);
       toastMsg("error", "Signup error");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   // ---------------- LOGIN -------------------
   const handleLogin = async () => {
+    setIsLoading(true);
+
     try {
       const res = await fetch(Allapi.auth.login.url, {
         method: Allapi.auth.login.method,
@@ -99,6 +107,8 @@ function LoginPage() {
     } catch (err) {
       console.error(err);
       toastMsg("error", "Login error");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -108,7 +118,7 @@ function LoginPage() {
     // Google OAuth will redirect back to callback which will read from localStorage
     
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-    const redirectUri = encodeURIComponent("https://www.printmaania.com/google/callback");
+    const redirectUri = encodeURIComponent("http://localhost:5173/google/callback");
     const scope = encodeURIComponent("openid email profile");
 
     const googleURL =
@@ -129,8 +139,10 @@ function LoginPage() {
         <button
           onClick={() => navigate("/")}
           className="w-10 h-10 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-colors duration-300"
+          disabled={isLoading}
         >
-          <span className="text-blue-600 text-xl font-bold">←</span>
+                      < ArrowLeft className="w-5 h-5 text-blue-700" />
+
         </button>
         <h1 className="ml-4 text-lg font-bold text-gray-800">Back</h1>
       </div>
@@ -142,21 +154,23 @@ function LoginPage() {
             <div className="flex border-b border-blue-500/30">
               <button
                 onClick={() => setIsSignup(false)}
+                disabled={isLoading}
                 className={`flex-1 py-3 px-4 text-center transition-all duration-200 ${
                   !isSignup
                     ? "border-b-2 border-white font-semibold text-white"
                     : "text-orange-200 hover:text-white"
-                }`}
+                } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 Sign In
               </button>
               <button
                 onClick={() => setIsSignup(true)}
+                disabled={isLoading}
                 className={`flex-1 py-3 px-4 text-center transition-all duration-200 ${
                   isSignup
                     ? "border-b-2 border-white font-semibold text-white"
                     : "text-orange-200 hover:text-white"
-                }`}
+                } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 Sign Up
               </button>
@@ -174,10 +188,11 @@ function LoginPage() {
                 <input
                   id="name"
                   type="text"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                   placeholder="Enter your full name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  disabled={isLoading}
                 />
               </div>
             )}
@@ -190,10 +205,11 @@ function LoginPage() {
               <input
                 id="email"
                 type="email"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
               />
             </div>
 
@@ -205,10 +221,11 @@ function LoginPage() {
               <input
                 id="password"
                 type="password"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
               />
             </div>
 
@@ -221,10 +238,11 @@ function LoginPage() {
                 <input
                   id="confirmPassword"
                   type="password"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                   placeholder="Confirm your password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
+                  disabled={isLoading}
                 />
               </div>
             )}
@@ -233,16 +251,18 @@ function LoginPage() {
             {!isSignup ? (
               <button
                 onClick={handleLogin}
-                className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+                disabled={isLoading}
+                className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Sign In
+                {isLoading ? "Signing In..." : "Sign In"}
               </button>
             ) : (
               <button
                 onClick={handleSignup}
-                className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+                disabled={isLoading}
+                className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Create Account
+                {isLoading ? "Creating Account..." : "Create Account"}
               </button>
             )}
 
@@ -256,7 +276,8 @@ function LoginPage() {
             {/* Google Login Button */}
             <button
               onClick={googleLogin}
-              className="w-full flex items-center justify-center gap-2 bg-blue-50 border border-blue-300 py-2.5 rounded-lg font-medium text-blue-700 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+              disabled={isLoading}
+              className="w-full flex items-center justify-center gap-2 bg-blue-50 border border-blue-300 py-2.5 rounded-lg font-medium text-blue-700 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path

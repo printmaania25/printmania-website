@@ -94,6 +94,12 @@ const quoteSchema = new mongoose.Schema(
         },
        description: { type: String }, 
       },
+      Others: {
+        image:{
+          type:String,
+        },
+        description:{type:String},
+      }
     },
 
     // USER SYSTEM

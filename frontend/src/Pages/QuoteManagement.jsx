@@ -191,21 +191,28 @@ const QuotesManagement = () => {
     Banners: { icon: Flag, label: "Banners" },
     IdCards: { icon: IdCard, label: "ID Cards" },
     Certificates: { icon: Award, label: "Certificates" },
-    Stickers: { icon: Sticker, label: "Stickers" },
+    Stickers: { icon: Sticker, label: "Posters" },
     Photoframes: { icon: Frame, label: "Photo Frames" },
     Mugs: { icon: Coffee, label: "Mugs" },
+    Others: { icon: FileText, label: "Others" },
   };
 
   const getActiveRequirements = (requirements) => {
     if (!requirements) return [];
+
     return Object.entries(requirements)
-      .filter(([_, data]) => data && data.quantity > 0)
+      .filter(([key, data]) => {
+        if (!data) return false;
+        if (key === "Others") return data.description || data.image; // show if something exists
+        return data.quantity > 0;
+      })
       .map(([key, data]) => ({
         name: key,
         ...data,
         config: productConfig[key] || { icon: Package, label: key }
       }));
   };
+
 
   if (loading) {
     return (
@@ -354,7 +361,7 @@ const QuotesManagement = () => {
                             </div>
                             <div>
                               <h4 className="font-bold text-gray-900">{item.config.label}</h4>
-                              <p className="text-sm text-blue-700">Quantity: {item.quantity}</p>
+                              <p className="text-sm text-blue-700">{item.quantity ? `Quantity: ${item.quantity}` : "Custom requirement"}</p>
                             </div>
                           </div>
                           <div className="p-4 space-y-3">

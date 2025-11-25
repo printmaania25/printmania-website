@@ -16,7 +16,6 @@ const orderSchema = new mongoose.Schema(
       quantity: { type: Number, required: true },
       total_price: { type: Number, required: true },
       uploadrequired: { type: Boolean, default: false },
-
       uploaded: { type: String }, // only if uploadrequired is true
     },
 
@@ -28,7 +27,7 @@ const orderSchema = new mongoose.Schema(
 
     username: { type: String, required: true },
     useremail: { type: String, required: true },
-
+    description: { type: String }, 
     address: {
       name: { type: String, required: true },
       mobile: { type: String, required: true },

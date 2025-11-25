@@ -96,7 +96,8 @@ export const googleAuth = async (req, res) => {
         code,
         client_id: clientId,
         client_secret: clientSecret,
-        redirect_uri: "https://www.printmaania.com/google/callback",  // Exact match for Google Console
+        // redirect_uri: "https://www.printmaania.com/google/callback",  // Exact match for Google Console
+        redirect_uri: "http://localhost:5173/google/callback", 
         grant_type: "authorization_code",
       }),
     });

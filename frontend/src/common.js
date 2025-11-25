@@ -1,4 +1,6 @@
-const backapi = "https://printmania-website.onrender.com";
+// const backapi = "https://printmania-website.onrender.com";
+const backapi = "http://localhost:5001";
+
 
 const Allapi = {
   auth: {

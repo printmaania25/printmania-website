@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import useUser from "../hooks/useUser";
 import Allapi from "../common";
 import Navbar from "../Components/Navbar";
+import { ArrowLeft } from "lucide-react";
 
 
 function Product() {
@@ -15,6 +16,7 @@ function Product() {
   const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [uploadImage, setUploadImage] = useState("");
+  const [description , setDiscription] = useState("");
   const [loading, setLoading] = useState(true);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [placingOrder, setPlacingOrder] = useState(false);
@@ -122,6 +124,7 @@ function Product() {
       price: product.price,
       quantity,
       address: addresses[selectedAddressIndex],
+      description:description,
     };
   
     if (product.uploadrequired) {
@@ -192,7 +195,7 @@ function Product() {
             onClick={() => navigate("/")}
             className="w-10 h-10 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-colors duration-300"
           >
-            <span className="text-blue-600 text-xl font-bold">←</span>
+              <ArrowLeft className="w-5 h-5 text-blue-700" />
           </button>
           <h1 className="ml-4 text-lg font-bold text-gray-800">Product Details</h1>
         </div>
@@ -320,6 +323,18 @@ function Product() {
                     +
                   </button>
                 </div>
+              </div>
+
+              {/* Description */}
+              <div className="bg-white rounded-2xl shadow-lg p-6">
+                  <label className="block text-xs md:text-sm font-bold text-blue-900 mb-2">Description (Optional)</label>
+                  <textarea 
+                    value={description} 
+                    onChange={(e) =>setDiscription(e.target.value) }
+                    rows="3" 
+                    placeholder="Add any specific details about this product..."
+                    className="w-full px-4 md:px-5 py-3 md:py-3.5 border-2 border-blue-200 rounded-xl focus:outline-none focus:border-blue-600 bg-blue-50 font-medium transition-all placeholder-gray-500 resize-none text-sm md:text-base" 
+                  />
               </div>
 
               {/* Upload Required */}

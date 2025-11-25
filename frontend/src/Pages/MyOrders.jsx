@@ -7,6 +7,7 @@ import {
   X, Mail, User, Phone, Calendar, Package, CheckCircle, AlertCircle, Truck,
   Shirt, Flag, IdCard, Award, Sticker, Frame, Coffee, Ban ,FileText
 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 function MyOrders() {
   const { token } = useUser();
@@ -131,20 +132,24 @@ fetchBulkQuotes();
     Banners: { icon: Flag, label: "Banners" },
     IdCards: { icon: IdCard, label: "ID Cards" },
     Certificates: { icon: Award, label: "Certificates" },
-    Stickers: { icon: Sticker, label: "Stickers" },
+    Stickers: { icon: Sticker, label: "Posters" },
     Photoframes: { icon: Frame, label: "Photo Frames" },
     Mugs: { icon: Coffee, label: "Mugs" },
+    Others: { icon: FileText, label: "Others" },
   };
 
   const getActiveRequirements = (requirements) => {
     if (!requirements) return [];
     return Object.entries(requirements)
-      .filter(([_, data]) => data && data.quantity > 0)
+      .filter(([_, data]) => data && (
+        data.quantity > 0 || data.description || data.image // allow Others
+      ))
       .map(([key, data]) => ({
         name: key,
         ...data,
         config: productConfig[key] || { icon: Package, label: key }
       }));
+
   };
 
   if (loading) {
@@ -168,7 +173,8 @@ fetchBulkQuotes();
             onClick={() => setSelectedOrder(null)}
             className="w-10 h-10 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-colors duration-300"
           >
-            <span className="text-blue-600 text-xl font-bold">←</span>
+          < ArrowLeft className="w-5 h-5 text-blue-700" />
+
           </button>
           <h1 className="ml-4 text-lg font-bold text-gray-800">
             {isBulk ? "Bulk Quote Details" : "Order Details"}
@@ -203,8 +209,14 @@ fetchBulkQuotes();
               <div className="mb-6 bg-blue-50 rounded-xl p-4 text-center">
                 <p className="text-sm font-medium text-blue-600">Tracking ID</p>
                 <p className="text-xl font-bold text-blue-800">{selectedOrder.trackingId}</p>
+
+                {/* Added message here */}
+                <p className="text-sm mt-2 text-gray-600 font-medium">
+                  Go to delivery.com website and search for this tracking ID
+                </p>
               </div>
             )}
+
 
             {/* BULK QUOTE - NEW BEAUTIFUL DESIGN */}
             {isBulk && (
@@ -253,7 +265,12 @@ fetchBulkQuotes();
                             </div>
                             <div>
                               <h4 className="font-bold text-gray-900">{item.config.label}</h4>
-                              <p className="text-sm text-blue-700">Quantity: {item.quantity}</p>
+                            {item.quantity ? (
+                                <p className="text-sm text-blue-700">Quantity: {item.quantity}</p>
+                              ) : (
+                                <p className="text-sm text-blue-700 italic">Custom requirement</p>
+                              )}
+
                             </div>
                           </div>
                           <div className="p-4 space-y-3">
@@ -375,6 +392,18 @@ fetchBulkQuotes();
                         <img src={selectedOrder.product.uploaded} className="w-full h-auto max-h-64 object-contain rounded-xl border-2 border-blue-200" alt="Uploaded" />
                       </div>
                     )}
+                    { selectedOrder.description && selectedOrder.description.length > 0 && (
+                      <div className="">
+                      <label className="block text-xs md:text-sm font-bold text-blue-900 mb-2">Description</label>
+                      <textarea 
+                        value={selectedOrder.description} 
+                        rows="4" 
+                        disabled
+                        placeholder="Add any specific details about this product..."
+                        className="w-full px-4 md:px-5 py-3 md:py-3.5 border-2 border-blue-200 rounded-xl focus:outline-none focus:border-blue-600 bg-blue-50 font-medium transition-all placeholder-gray-500 resize-none text-sm md:text-base" 
+                      />
+                     </div>
+                    )}
 
 
                     <div className="mt-6 pt-6 border-t-2 border-gray-200">
@@ -436,7 +465,8 @@ fetchBulkQuotes();
     <div className="w-full min-h-screen bg-gradient-to-b from-white to-blue-50 pt-16">
       <div className="w-full h-16 bg-white flex items-center px-4 md:px-8 shadow-sm">
         <button onClick={() => navigate("/")} className="w-10 h-10 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-colors duration-300">
-          <span className="text-blue-600 text-xl font-bold">←</span>
+         
+                         < ArrowLeft className="w-5 h-5 text-blue-700" />
         </button>
         <h1 className="ml-4 text-lg font-bold text-gray-800">My Requests</h1>
       </div>

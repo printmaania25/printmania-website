@@ -5,6 +5,7 @@ import Allapi from "../common";
 import toast from "react-hot-toast";
 import Navbar from "../Components/Navbar";
 import scanner from "../assets/scanner.jpg";
+import { ArrowLeft } from "lucide-react";
 
 function Order() {
   const { id } = useParams();
@@ -20,6 +21,7 @@ function Order() {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [codEnabled, setCodEnabled] = useState(false);
+  const [description , setDescription] = useState("");
 
   const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
   const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
@@ -39,6 +41,7 @@ function Order() {
     const found = data.orders.find((o) => o._id === id);
     setOrder(found);
     setCodEnabled(found.cod || false); // Load existing COD status
+    setDescription(found.description);
   }
 
   const handleCodToggle = (enabled) => {
@@ -158,7 +161,7 @@ function Order() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`
           },
-          body: JSON.stringify({ screenshots: allScreenshots, cod: codEnabled }),
+          body: JSON.stringify({ screenshots: allScreenshots, cod: codEnabled , description:description }),
         });
 
         const data = await res.json();
@@ -176,7 +179,7 @@ function Order() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`
           },
-          body: JSON.stringify({ screenshots: order.transactionscreenshot || [], cod: codEnabled }),
+          body: JSON.stringify({ screenshots: order.transactionscreenshot || [], cod: codEnabled , description:description }),
         });
 
         const data = await res.json();
@@ -222,7 +225,7 @@ function Order() {
               onClick={() => navigate(-1)}
               className="w-10 h-10 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-colors duration-300"
             >
-              <span className="text-blue-600 text-xl font-bold">←</span>
+             < ArrowLeft className="w-5 h-5 text-blue-700" />
             </button>
             <h1 className="ml-4 text-lg font-bold text-gray-800">Order Details</h1>
           </div>
@@ -299,6 +302,19 @@ function Order() {
                   </div>
                 </div>
               )}
+
+
+              <div className="">
+                  <label className="block text-xs md:text-sm font-bold text-blue-900 mb-2">Description</label>
+                  <textarea 
+                    value={description} 
+                    rows="3" 
+                    onChange={(e)=> setDescription(e.target.value)}
+                    placeholder="Add any specific details about this product..."
+                    className="w-full px-4 md:px-5 py-3 md:py-3.5 border-2 border-blue-200 rounded-xl focus:outline-none focus:border-blue-600 bg-blue-50 font-medium transition-all placeholder-gray-500 resize-none text-sm md:text-base" 
+                  />
+              </div>
+
 
               {order.product.uploadrequired && order.product.uploaded && (
                 <div className="mt-4">

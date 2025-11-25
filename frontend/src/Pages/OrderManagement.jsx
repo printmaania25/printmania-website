@@ -386,6 +386,19 @@ function OrderManagement() {
             </div>
           </div>
 
+          { selectedOrder.description && selectedOrder.description.length > 0 && (
+              <div className="mb-3">
+              <label className="block text-xs md:text-sm font-bold text-blue-900 mb-2">Description</label>
+              <textarea 
+                value={selectedOrder.description} 
+                rows="4" 
+                disabled
+                placeholder="Add any specific details about this product..."
+                className="w-full px-4 md:px-5 py-3 md:py-3.5 border-2 border-blue-200 rounded-xl focus:outline-none focus:border-blue-600 bg-blue-50 font-medium transition-all placeholder-gray-500 resize-none text-sm md:text-base" 
+              />
+              </div>
+            )}
+
           {/* Transaction Screenshots */}
           <div className="mb-6">
             {/* COD Notice */}

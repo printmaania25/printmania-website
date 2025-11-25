@@ -480,9 +480,8 @@ function HomePage() {
             <div>
               <h3 className="text-xl font-bold mb-3">Quick Links</h3>
               <ul className="space-y-2 text-sm text-blue-100">
-                <li><a href="#" className="hover:text-white">About Us</a></li>
-                <li><a href="#" className="hover:text-white">All Products</a></li>
-                <li><a href="#" className="hover:text-white">Contact</a></li>
+                <li><a href="/bulkorders" className="hover:text-white">About Us</a></li>
+                <li><a href="/" className="hover:text-white">All Products</a></li>
               </ul>
             </div>
             <div>

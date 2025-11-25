@@ -3,6 +3,7 @@ import useUser from "../hooks/useUser";
 import { useToast } from "../Providers/ToastProvider";
 import Allapi from "../common";
 import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 
 function ProfilePage() {
   const { user, token } = useUser();
@@ -76,7 +77,7 @@ function ProfilePage() {
           onClick={() => navigate("/")}
           className="w-10 h-10 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-colors duration-300"
         >
-          <span className="text-blue-600 text-xl font-bold">←</span>
+                       < ArrowLeft className="w-5 h-5 text-blue-700" />
         </button>
         <h1 className="ml-4 text-lg font-bold text-gray-800">Back</h1>
       </div>

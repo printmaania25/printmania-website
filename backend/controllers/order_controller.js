@@ -84,33 +84,53 @@ function emailTemplate(title, order, screenshots = []) {
     `
     : "";
 
+  // FOOTER SIGNATURE
+  const footerHtml = `
+    <footer style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; color: #666; font-size: 12px;">
+      <p><strong>Printmaania</strong><br>Nuzvid, Vijayawada</p>
+      <p>Contact: <a href="tel:9063347447" style="color: #007bff; text-decoration: none;">9063347447</a></p>
+    </footer>
+  `;
+
   return `
-  <div style="font-family: Arial, sans-serif; max-width: 650px; margin: auto; padding: 20px; background: #ffffff;">
-    <h2 style="background: #007bff; color: white; padding: 12px; text-align: center; border-radius: 5px;">
+  <div style="font-family: Arial, sans-serif; max-width: 650px; margin: auto; padding: 20px; background: #ffffff; border: 1px solid #ddd; border-radius: 8px;">
+    <h2 style="background: linear-gradient(135deg, #007bff, #0056b3); color: white; padding: 15px; text-align: center; border-radius: 5px 5px 0 0; margin: -20px -20px 20px -20px;">
       ${title} — Order ${order._id}
     </h2>
 
-    <h3>Order Placed By</h3>
-    <p><strong>Name:</strong> ${order.username}</p>
-    <p><strong>Email:</strong> ${order.useremail}</p>
+    <section style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+      <h3 style="margin: 0 0 10px 0; color: #333;">Order Placed By</h3>
+      <p style="margin: 5px 0;"><strong>Name:</strong> ${order.username}</p>
+      <p style="margin: 5px 0;"><strong>Email:</strong> ${order.useremail}</p>
+    </section>
 
-    <h3>Product Details</h3>
-    <p><strong>Name:</strong> ${order.product.name}</p>
-    <p><strong>Size:</strong> ${order.product.size || "N/A"}</p>
-    <p><strong>Price:</strong> ₹${order.product.price}</p>
-    <p><strong>Quantity:</strong> ${order.product.quantity}</p>
-    <p><strong>Total:</strong>
-      <strong style="font-size:18px; color:#d32f2f;">₹${order.product.total_price}</strong>
-    </p>
+    <section style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+      <h3 style="margin: 0 0 10px 0; color: #333;">Product Details</h3>
+      <p style="margin: 5px 0;"><strong>Name:</strong> ${order.product.name}</p>
+      <p style="margin: 5px 0;"><strong>Size:</strong> ${order.product.size || "N/A"}</p>
+      <p style="margin: 5px 0;"><strong>Price:</strong> ₹${order.product.price}</p>
+      <p style="margin: 5px 0;"><strong>Quantity:</strong> ${order.product.quantity}</p>
+      <p style="margin: 5px 0;"><strong>Total:</strong>
+        <strong style="font-size:18px; color:#d32f2f;">₹${order.product.total_price}</strong>
+      </p>
+    </section>
 
-    <h3>Delivery Address</h3>
-    <p><strong>Name:</strong> ${order.address?.name}</p>
-    <p><strong>Mobile:</strong> ${order.address?.mobile}</p>
-    <p><strong>Door No:</strong> ${order.address?.doorNo}</p>
-    <p><strong>Street:</strong> ${order.address?.street}</p>
-    <p><strong>City:</strong> ${order.address?.city}</p>
-    <p><strong>Pincode:</strong> ${order.address?.pincode}</p>
-    <p><strong>State:</strong> ${order.address?.state}</p>
+    <section style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+      <h3 style="margin: 0 0 10px 0; color: #333;">Descriptio:</h3>
+      <p style="margin: 5px 0;"> ${order.description}</p>
+      </p>
+    </section>
+
+    <section style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+      <h3 style="margin: 0 0 10px 0; color: #333;">Delivery Address</h3>
+      <p style="margin: 5px 0;"><strong>Name:</strong> ${order.address?.name}</p>
+      <p style="margin: 5px 0;"><strong>Mobile:</strong> ${order.address?.mobile}</p>
+      <p style="margin: 5px 0;"><strong>Door No:</strong> ${order.address?.doorNo}</p>
+      <p style="margin: 5px 0;"><strong>Street:</strong> ${order.address?.street}</p>
+      <p style="margin: 5px 0;"><strong>City:</strong> ${order.address?.city}</p>
+      <p style="margin: 5px 0;"><strong>Pincode:</strong> ${order.address?.pincode}</p>
+      <p style="margin: 5px 0;"><strong>State:</strong> ${order.address?.state}</p>
+    </section>
 
     ${codHtml}
     ${trackingHtml}
@@ -119,10 +139,11 @@ function emailTemplate(title, order, screenshots = []) {
     ${uploadedImageHtml}
     ${txnHtml}
 
-    <hr style="margin:30px 0;">
-    <p style="text-align:center; color:#888; font-size:12px;">
+    <hr style="margin:30px 0; border: none; border-top: 1px solid #eee;">
+    <p style="text-align:center; color:#888; font-size:12px; margin-bottom: 10px;">
       This is an automated email — Do not reply.
     </p>
+    ${footerHtml}
   </div>
   `;
 }
@@ -130,7 +151,7 @@ function emailTemplate(title, order, screenshots = []) {
 /* ================= CREATE ORDER ================= */
 export const createOrder = async (req, res) => {
   try {
-    const { productId, size, price, quantity, address, uploaded } = req.body;
+    const { productId, size, price, quantity, address, uploaded , description} = req.body;
 
     const product = await Product.findById(productId);
     if (!product) return res.status(404).json({ success: false, message: "Product not found" });
@@ -143,6 +164,7 @@ export const createOrder = async (req, res) => {
       userId: req.user._id,
       username: req.user.name,
       useremail: req.user.email,
+      description: description,
       address,
       transactionscreenshot: [],
       cancelled: false,
@@ -150,15 +172,15 @@ export const createOrder = async (req, res) => {
 
     await User.findByIdAndUpdate(req.user._id, { $push: { orders: order._id } });
 
-    await sendMail({
+    sendMail({
       to: ADMIN_EMAIL,
-      subject: `🛍 New Order — ${order._id}`,
+      subject: `New Order Received — Order ${order._id}`,
       html: emailTemplate("New Order Received", order),
     });
 
-    await sendMail({
+    sendMail({
       to: order.useremail,
-      subject: `🛍 Order Placed Successfully id- ${order._id} `,
+      subject: `Order Placed Successfully — Order ${order._id}`,
       html: emailTemplate("Order Placed Successfully", order),
     });
 
@@ -172,7 +194,7 @@ export const createOrder = async (req, res) => {
 export const uploadTransactionScreenshots = async (req, res) => {
   try {
     const { id } = req.params;
-    const { screenshots, cod } = req.body; // now receiving cod as well
+    const { screenshots, cod , description } = req.body; // now receiving cod as well
 
     const order = await Order.findById(id);
     if (!order) return res.status(404).json({ success: false, message: "Order not found" });
@@ -184,6 +206,8 @@ export const uploadTransactionScreenshots = async (req, res) => {
       order.transactionscreenshot.push(...screenshots);
     }
 
+    order.description = description;
+
     // update COD if provided
     if (typeof cod !== "undefined") {
       order.cod = cod;
@@ -192,15 +216,15 @@ export const uploadTransactionScreenshots = async (req, res) => {
     await order.save();
 
     // send email with updated status + proof screenshots if any
-    await sendMail({
+    sendMail({
       to: ADMIN_EMAIL,
-      subject: `💰 Payment Proof Uploaded — Order ${order._id}`,
+      subject: `Payment Proof Uploaded — Order ${order._id}`,
       html: emailTemplate("Payment Proof Uploaded", order, order.transactionscreenshot),
     });
 
-    await sendMail({
+    sendMail({
       to: order.useremail,
-      subject: `💰 Payment Proof Received — ${order._id}`,
+      subject: `Payment Proof Received — Order ${order._id}`,
       html: emailTemplate("Payment Proof Received", order, order.transactionscreenshot),
     });
 
@@ -228,15 +252,15 @@ export const cancelOrder = async (req, res) => {
     order.cancelled = true;
     await order.save();
 
-    await sendMail({
+    sendMail({
       to: ADMIN_EMAIL,
-      subject: `❌ Order Cancelled — ${order._id}`,
+      subject: `Order Cancelled — Order ${order._id}`,
       html: emailTemplate("Order Cancelled", order, order.transactionscreenshot),
     });
 
-    await sendMail({
+    sendMail({
       to: order.useremail,
-      subject: `❌ Order Cancelled — ${order._id}`,
+      subject: `Order Cancelled — Order ${order._id}`,
       html: emailTemplate("Order Cancelled", order, order.transactionscreenshot),
     });
 
@@ -257,15 +281,15 @@ export const markDelivered = async (req, res) => {
     order.delivered = true;
     await order.save();
 
-    await sendMail({
+    sendMail({
       to: ADMIN_EMAIL,
-      subject: `📦 Order Delivered — ${order._id}`,
+      subject: `Order Delivered — Order ${order._id}`,
       html: emailTemplate("Order Delivered", order, order.transactionscreenshot),
     });
 
-    await sendMail({
+    sendMail({
       to: order.useremail,
-      subject: `📦 Order Delivered — ${order._id}`,
+      subject: `Order Delivered — Order ${order._id}`,
       html: emailTemplate("Order Delivered", order, order.transactionscreenshot),
     });
 
@@ -288,15 +312,15 @@ export const assignTrackingId = async (req, res) => {
     order.trackingId = trackingId;
     await order.save();
 
-    await sendMail({
+    sendMail({
       to: ADMIN_EMAIL,
-      subject: `🚚 Tracking ID Assigned — ${order._id}`,
+      subject: `Tracking ID Assigned — Order ${order._id}`,
       html: emailTemplate("Tracking Assigned", order, order.transactionscreenshot),
     });
 
-    await sendMail({
+    sendMail({
       to: order.useremail,
-      subject: `🚚 Tracking ID Assigned — ${order._id}`,
+      subject: `Tracking ID Assigned — Order ${order._id}`,
       html: emailTemplate("Tracking ID Assigned", order, order.transactionscreenshot),
     });
 
