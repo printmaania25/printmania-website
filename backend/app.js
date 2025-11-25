@@ -17,13 +17,19 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-    origin: ["http://localhost:5173","*"],
+    origin: [    "https://printmaania.com",
+    "https://www.printmaania.com","http://localhost:5173"],
      credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Credentials", "true");
+  next();
+});
 app.use(cookieParser());
 app.use(express.json());
+app.set("trust proxy", 1); // Important if you later use cookies/sessions behind reverse proxy
 
 
 // -------- Routes --------

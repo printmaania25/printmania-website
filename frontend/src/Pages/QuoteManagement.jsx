@@ -359,13 +359,20 @@ const QuotesManagement = () => {
                           </div>
                           <div className="p-4 space-y-3">
                             {(item.type || item.size) && (
-                              <p className="text-sm text-gray-700">
-                                <span className="font-medium">Size/Type:</span> {item.type || item.size}
+                              <p className="text-sm text-gray-900">
+                                <span className="font-bold">Size/Type:</span> {item.type || item.size}
                               </p>
                             )}
+
+                            {item.description && item.description.length > 0 && (
+                              <p className="text-sm bg-orange-50 text-orange-800 px-3 py-2 rounded-lg border border-orange-200">
+                                <span className="font-bold text-orange-900">Description:</span> {item.description}
+                              </p>
+                            )}
+                            
                             {item.image ? (
                               <div className="mt-3">
-                                <p className="text-xs font-medium text-gray-600 mb-2">Uploaded Design:</p>
+                                <p className="text-xs font-bold text-gray-900 mb-2">Uploaded Design:</p>
                                 <img
                                   src={item.image}
                                   alt={`${item.config.label} design`}
@@ -432,8 +439,17 @@ const QuotesManagement = () => {
                       disabled={processing}
                       className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-70 shadow-lg hover:shadow-xl transition-all"
                     >
-                      <CheckCircle className="w-5 h-5" /> Confirm Quote
+                      {processing ? (
+                        <>
+                          <span className="animate-pulse">Confirming... Quote</span>
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle className="w-5 h-5" /> Confirm Quote
+                        </>
+                      )}
                     </button>
+
                   )}
 
                   {!selectedQuote.trackingId && selectedQuote.confirm && (

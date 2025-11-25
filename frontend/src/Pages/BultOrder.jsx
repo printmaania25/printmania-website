@@ -10,6 +10,23 @@ import bulk1 from '../assets/bulk1.webp';
 import bulk2 from '../assets/bulk2.jpg';
 import bulk3 from '../assets/bulk3.jpeg';
 import bulk4 from '../assets/bulk4.webp';
+import shirt1 from '../assets/shirts/shirt1.jpeg';
+import shirt2 from '../assets/shirts/shirt2.jpeg';
+import shirt3 from '../assets/shirts/shirt3.jpeg';
+import shirt4 from '../assets/shirts/shirt4.jpeg';
+import shirt5 from '../assets/shirts/shirt5.jpeg';
+import shirt6 from '../assets/shirts/shirt6.jpeg';
+import shirt7 from '../assets/shirts/shirt7.jpeg';
+import shirt8 from '../assets/shirts/shirt8.jpeg';
+import shirt9 from '../assets/shirts/shirt9.jpeg';
+import shirt10 from '../assets/shirts/shirt10.jpeg';
+import r1 from '../assets/remaining/r1.jpeg';
+import r2 from '../assets/remaining/r2.jpeg';
+import r3 from '../assets/remaining/r3.jpeg';
+import r4 from '../assets/remaining/r4.jpeg';
+import r5 from '../assets/remaining/r5.jpeg';
+import r6 from '../assets/remaining/r6.jpeg';
+import r7 from '../assets/remaining/r7.jpeg';
 
 // Centralized size/type options for dropdowns
 const SIZE_OPTIONS = {
@@ -20,6 +37,7 @@ const SIZE_OPTIONS = {
   Photoframes: ['4x6', '5x7', '8x10', 'A4', 'Custom'],
   Mugs: ['11oz Standard', '15oz Large', 'Magic Mug', 'Custom']
 };
+
 const BulkOrder = () => {
   const { user, token } = useUser();
   const toastMsg = useToast();
@@ -41,13 +59,13 @@ const BulkOrder = () => {
   const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 
   const [requirementsData, setRequirementsData] = useState({
-    Tshirts: { type: '', quantity: 0, image: '' },
-    Banners: { size: '', quantity: 0, image: '' },
-    IdCards: { size: '', quantity: 0, image: '' },
-    Certificates: { size: '', quantity: 0, image: '' },
-    Stickers: { size: '', quantity: 0, image: '' },
-    Photoframes: { size: '', quantity: 0, image: '' },
-    Mugs: { size: '', quantity: 0, image: '' },
+    Tshirts: { type: '', quantity: 0, image: '', description: '' },
+    Banners: { size: '', quantity: 0, image: '', description: '' },
+    IdCards: { size: '', quantity: 0, image: '', description: '' },
+    Certificates: { size: '', quantity: 0, image: '', description: '' },
+    Stickers: { size: '', quantity: 0, image: '', description: '' },
+    Photoframes: { size: '', quantity: 0, image: '', description: '' },
+    Mugs: { size: '', quantity: 0, image: '', description: '' },
   });
 
   const products = [
@@ -60,13 +78,19 @@ const BulkOrder = () => {
     { key: 'Mugs', icon: Coffee, label: 'Mugs' },
   ];
 
-  const tshirtColors = ['White', 'Black'];
-  const tshirtTypes = ['Rounded Neck', 'Collared Neck'];
-  const tshirtBackOptions = ['Printed Back', 'Non-Printed Back'];
+  const tshirtModels = ['Rounded Neck', 'Collar', 'Full hand T shirt', 'Hoodies', 'Sports'];
+  const tshirtSizes = ['S', 'M', 'L', 'XL', '2XL', '3XL'];
+  const tshirtFrontOptions = ['Printed front', 'Non printed front'];
+  const tshirtBackOptions = ['Printed Back', 'Non Printed Back'];
 
+  const [tshirtModel, setTshirtModel] = useState('');
   const [tshirtColor, setTshirtColor] = useState('');
-  const [tshirtNeck, setTshirtNeck] = useState('');
+  const [tshirtSize, setTshirtSize] = useState('');
+  const [tshirtFront, setTshirtFront] = useState('');
   const [tshirtBack, setTshirtBack] = useState('');
+
+  const preBuiltShirts = [shirt1, shirt2, shirt3, shirt4, shirt5, shirt6, shirt7, shirt8, shirt9, shirt10];
+  const otherWorks = [r1, r2, r3, r4, r5, r6, r7];
 
   // Hero images array
   const heroImages = [bulk, bulk1, bulk2, bulk3, bulk4];
@@ -84,10 +108,12 @@ const BulkOrder = () => {
       setRequirementsData(JSON.parse(savedRequirements));
     }
     if (savedSelections) {
-      const { selectedProduct: selProd, tshirtColor: color, tshirtNeck: neck, tshirtBack: back } = JSON.parse(savedSelections);
+      const { selectedProduct: selProd, tshirtModel: model, tshirtColor: color, tshirtSize: size, tshirtFront: front, tshirtBack: back } = JSON.parse(savedSelections);
       setSelectedProduct(selProd);
+      setTshirtModel(model);
       setTshirtColor(color);
-      setTshirtNeck(neck);
+      setTshirtSize(size);
+      setTshirtFront(front);
       setTshirtBack(back);
     }
   }, []);
@@ -104,11 +130,13 @@ const BulkOrder = () => {
   useEffect(() => {
     localStorage.setItem('bulkOrderSelections', JSON.stringify({
       selectedProduct,
+      tshirtModel,
       tshirtColor,
-      tshirtNeck,
+      tshirtSize,
+      tshirtFront,
       tshirtBack
     }));
-  }, [selectedProduct, tshirtColor, tshirtNeck, tshirtBack]);
+  }, [selectedProduct, tshirtModel, tshirtColor, tshirtSize, tshirtFront, tshirtBack]);
 
   // Clear localStorage on successful submit
   const clearFormData = () => {
@@ -120,13 +148,13 @@ const BulkOrder = () => {
   // Update T-shirt type string when selections change
   useEffect(() => {
     if (selectedProduct === 'Tshirts') {
-      const type = [tshirtColor, tshirtNeck, tshirtBack].filter(Boolean).join(' - ');
+      const type = [tshirtModel, tshirtColor, tshirtSize, tshirtFront, tshirtBack].filter(Boolean).join(' - ');
       setRequirementsData(prev => ({
         ...prev,
         Tshirts: { ...prev.Tshirts, type }
       }));
     }
-  }, [tshirtColor, tshirtNeck, tshirtBack, selectedProduct]);
+  }, [tshirtModel, tshirtColor, tshirtSize, tshirtFront, tshirtBack, selectedProduct]);
 
   const uploadToCloudinary = async (file) => {
     const fd = new FormData();
@@ -179,6 +207,13 @@ const BulkOrder = () => {
     }));
   };
 
+  const handleDescriptionChange = (productKey, value) => {
+    setRequirementsData(prev => ({
+      ...prev,
+      [productKey]: { ...prev[productKey], description: value }
+    }));
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -227,17 +262,19 @@ const BulkOrder = () => {
         clearFormData();
         setFormData({ name: '', email: '', mobile: '', company: '', description: '' });
         setRequirementsData({
-          Tshirts: { type: '', quantity: 0, image: '' },
-          Banners: { size: '', quantity: 0, image: '' },
-          IdCards: { size: '', quantity: 0, image: '' },
-          Certificates: { size: '', quantity: 0, image: '' },
-          Stickers: { size: '', quantity: 0, image: '' },
-          Photoframes: { size: '', quantity: 0, image: '' },
-          Mugs: { size: '', quantity: 0, image: '' },
+          Tshirts: { type: '', quantity: 0, image: '', description: '' },
+          Banners: { size: '', quantity: 0, image: '', description: '' },
+          IdCards: { size: '', quantity: 0, image: '', description: '' },
+          Certificates: { size: '', quantity: 0, image: '', description: '' },
+          Stickers: { size: '', quantity: 0, image: '', description: '' },
+          Photoframes: { size: '', quantity: 0, image: '', description: '' },
+          Mugs: { size: '', quantity: 0, image: '', description: '' },
         });
         setSelectedProduct(null);
+        setTshirtModel('');
         setTshirtColor('');
-        setTshirtNeck('');
+        setTshirtSize('');
+        setTshirtFront('');
         setTshirtBack('');
       } else {
         throw new Error(result.message || 'Failed to submit quote');
@@ -258,11 +295,33 @@ const BulkOrder = () => {
           <img src={logo} alt="PrintMaania" className="h-8 w-auto" />
           <div className="text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-600 to-orange-500 bg-clip-text text-transparent">PrintMaania</div>
         </div>
-        <div className="flex items-center space-x-3 md:space-x-6">
-          <span className="text-gray-700 font-medium hidden md:inline text-sm">Print Solutions</span>
-          <a href="tel:9830090000" className="bg-gradient-to-r from-blue-500 to-orange-500 text-white px-3 md:px-6 py-2 md:py-2.5 rounded-full text-xs md:text-sm font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center gap-1 md:gap-2">
+
+        <div className="flex items-center space-x-1 md:space-x-2">
+          <button
+            onClick={() => window.open('https://wa.me/919063347447', '_blank', 'noopener,noreferrer')}
+            className={`flex items-center justify-center  w-9 h-9 md:w-11 md:h-11 rounded-full bg-green-500 hover:bg-green-600 text-white shadow-md transition-all duration-300 `}
+            aria-label="WhatsApp"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.472-.148-.67.149-.198.297-.768.967-.94 1.166-.173.198-.347.223-.644.074-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.173.198-.297.298-.495.099-.198.05-.371-.025-.52-.074-.149-.669-1.611-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.298-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.076 4.487.71.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.718 2.007-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+              <path d="M20.52 3.48A11.92 11.92 0 0012 0C5.383 0 0 5.383 0 12c0 2.116.553 4.19 1.602 6.02L0 24l6.18-1.584A11.936 11.936 0 0012 24c6.617 0 12-5.383 12-12 0-3.197-1.247-6.203-3.48-8.52zM12 21.6a9.56 9.56 0 01-4.91-1.36l-.35-.21-3.67.94.98-3.58-.23-.37A9.55 9.55 0 012.4 12c0-5.283 4.317-9.6 9.6-9.6 5.283 0 9.6 4.317 9.6 9.6 0 5.283-4.317 9.6-9.6 9.6z" />
+            </svg>
+          </button>
+
+          {/* Instagram */}
+          <button
+            onClick={() => window.open('https://www.instagram.com/print_maania?igsh=NGc4dGF5aTBtbWRm', '_blank', 'noopener,noreferrer')}
+            className={`flex items-center justify-center mr-3 w-9 h-9 md:w-11 md:h-11 rounded-full bg-pink-600 hover:bg-pink-700 text-white shadow-md transition-all duration-300`}
+            aria-label="Instagram"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M7 2C4.243 2 2 4.243 2 7v10c0 2.757 2.243 5 5 5h10c2.757 0 5-2.243 5-5V7c0-2.757-2.243-5-5-5H7zm10 2c1.654 0 3 1.346 3 3v10c0 1.654-1.346 3-3 3H7c-1.654 0-3-1.346-3-3V7c0-1.654 1.346-3 3-3h10zm-5 3a5 5 0 100 10 5 5 0 000-10zm0 2a3 3 0 110 6 3 3 0 010-6zm4.8-.9a1.1 1.1 0 11-2.2 0 1.1 1.1 0 012.2 0z"/>
+            </svg>
+          </button>
+
+          <a href="tel:9063347447" className="bg-gradient-to-r from-blue-500 to-orange-500 text-white px-3 md:px-6 py-2 md:py-2.5 rounded-full text-xs md:text-sm font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center gap-1 md:gap-2">
             <Phone className="w-3 h-3 md:w-4 md:h-4" />
-            <span className="hidden sm:inline">9830 09 00 00</span>
+            <span className="hidden sm:inline">9063347447</span>
             <span className="sm:hidden">Call</span>
           </a>
         </div>
@@ -366,7 +425,7 @@ const BulkOrder = () => {
                 rows="3" 
                 className="w-full px-4 md:px-5 py-3 md:py-3.5 border-2 border-blue-200 rounded-xl focus:outline-none focus:border-blue-600 bg-blue-50 font-medium transition-all placeholder-gray-500 resize-none text-sm md:text-base" 
                 disabled={isSubmitting}
-              ></textarea>
+              />
             </div>
 
             {/* Select Requirements */}
@@ -406,40 +465,81 @@ const BulkOrder = () => {
                 </div>
 
                 {selectedProduct === 'Tshirts' ? (
-                  <div className="space-y-5 md:space-y-6">
-                    <div>
-                      <label className="block text-xs md:text-sm font-bold text-blue-900 mb-3">Color</label>
-                      <div className="grid grid-cols-2 gap-3">
-                        {tshirtColors.map(c => (
-                          <button key={c} onClick={() => setTshirtColor(c)} className={`py-2 md:py-3 px-3 rounded-xl font-bold transition-all text-sm md:text-base ${tshirtColor === c ? 'bg-blue-600 text-white shadow-lg' : 'bg-white text-blue-800 border-2 border-blue-300 hover:border-blue-500'}`}>
-                            {c}
-                          </button>
+                  <div>
+                    <div className="mb-6">
+                      <h5 className="text-lg font-bold text-blue-900 mb-4">Our Pre-built Designs</h5>
+                      <div className="flex overflow-x-auto space-x-4 pb-4 scrollbar-hide">
+                        {preBuiltShirts.map((img, idx) => (
+                          <img
+                            key={idx}
+                            src={img}
+                            alt={`Pre-built shirt ${idx + 1}`}
+                            className="flex-shrink-0 w-32 h-32 md:w-40 md:h-40 object-cover rounded-lg shadow-md"
+                          />
                         ))}
                       </div>
                     </div>
-                    <div>
-                      <label className="block text-xs md:text-sm font-bold text-blue-900 mb-3">Neck Type</label>
-                      <div className="grid grid-cols-2 gap-3">
-                        {tshirtTypes.map(t => (
-                          <button key={t} onClick={() => setTshirtNeck(t)} className={`py-2 md:py-3 px-3 rounded-xl font-bold transition-all text-sm md:text-base ${tshirtNeck === t ? 'bg-blue-600 text-white shadow-lg' : 'bg-white text-blue-800 border-2 border-blue-300 hover:border-blue-500'}`}>
-                            {t}
-                          </button>
-                        ))}
+                    <div className="space-y-5 md:space-y-6">
+                      <div>
+                        <label className="block text-xs md:text-sm font-bold text-blue-900 mb-3">Model</label>
+                        <div className="grid grid-cols-2 gap-3">
+                          {tshirtModels.map(m => (
+                            <button key={m} onClick={() => setTshirtModel(m)} className={`py-2 md:py-3 px-3 rounded-xl font-bold transition-all text-sm md:text-base ${tshirtModel === m ? 'bg-blue-600 text-white shadow-lg' : 'bg-white text-blue-800 border-2 border-blue-300 hover:border-blue-500'}`}>
+                              {m}
+                            </button>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                    <div>
-                      <label className="block text-xs md:text-sm font-bold text-blue-900 mb-3">Back</label>
-                      <div className="grid grid-cols-2 gap-3">
-                        {tshirtBackOptions.map(o => (
-                          <button key={o} onClick={() => setTshirtBack(o)} className={`py-2 md:py-3 px-3 rounded-xl font-bold transition-all text-sm md:text-base ${tshirtBack === o ? 'bg-blue-600 text-white shadow-lg' : 'bg-white text-blue-800 border-2 border-blue-300 hover:border-blue-500'}`}>
-                            {o}
-                          </button>
-                        ))}
+                      <div>
+                        <label className="block text-xs md:text-sm font-bold text-blue-900 mb-3">Color</label>
+                        <input 
+                          type="text" 
+                          value={tshirtColor} 
+                          onChange={(e) => setTshirtColor(e.target.value)} 
+                          placeholder="Type the color (e.g., White, Black, Red)" 
+                          className="w-full px-3 md:px-4 py-2 md:py-3 rounded-xl border-2 border-blue-300 focus:border-blue-600 bg-white focus:outline-none text-sm md:text-base" 
+                        />
                       </div>
-                    </div>
-                    <div>
-                      <label className="block text-xs md:text-sm font-bold text-blue-900 mb-2">Quantity</label>
-                      <input type="number" min="1" value={requirementsData.Tshirts.quantity || ''} onChange={(e) => handleQuantityChange('Tshirts', e.target.value)} className="w-full px-3 md:px-4 py-2 md:py-3 rounded-xl border-2 border-blue-300 focus:border-blue-600 bg-white focus:outline-none text-sm md:text-base" />
+                      <div>
+                        <label className="block text-xs md:text-sm font-bold text-blue-900 mb-3">Size</label>
+                        <div className="relative">
+                          <select
+                            value={tshirtSize}
+                            onChange={(e) => setTshirtSize(e.target.value)}
+                            className="w-full px-4 py-3 md:py-3.5 rounded-xl border-2 border-blue-300 focus:border-blue-600 bg-white appearance-none cursor-pointer text-sm md:text-base font-medium text-gray-800"
+                          >
+                            <option value="">Select Size</option>
+                            {tshirtSizes.map(size => (
+                              <option key={size} value={size}>{size}</option>
+                            ))}
+                          </select>
+                          <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-blue-600 pointer-events-none" />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs md:text-sm font-bold text-blue-900 mb-3">Front</label>
+                        <div className="grid grid-cols-2 gap-3">
+                          {tshirtFrontOptions.map(f => (
+                            <button key={f} onClick={() => setTshirtFront(f)} className={`py-2 md:py-3 px-3 rounded-xl font-bold transition-all text-sm md:text-base ${tshirtFront === f ? 'bg-blue-600 text-white shadow-lg' : 'bg-white text-blue-800 border-2 border-blue-300 hover:border-blue-500'}`}>
+                              {f}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs md:text-sm font-bold text-blue-900 mb-3">Back</label>
+                        <div className="grid grid-cols-2 gap-3">
+                          {tshirtBackOptions.map(o => (
+                            <button key={o} onClick={() => setTshirtBack(o)} className={`py-2 md:py-3 px-3 rounded-xl font-bold transition-all text-sm md:text-base ${tshirtBack === o ? 'bg-blue-600 text-white shadow-lg' : 'bg-white text-blue-800 border-2 border-blue-300 hover:border-blue-500'}`}>
+                              {o}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs md:text-sm font-bold text-blue-900 mb-2">Quantity</label>
+                        <input type="number" min="1" value={requirementsData.Tshirts.quantity || ''} onChange={(e) => handleQuantityChange('Tshirts', e.target.value)} className="w-full px-3 md:px-4 py-2 md:py-3 rounded-xl border-2 border-blue-300 focus:border-blue-600 bg-white focus:outline-none text-sm md:text-base" />
+                      </div>
                     </div>
                   </div>
                 ) : (
@@ -472,6 +572,18 @@ const BulkOrder = () => {
                     </div>
                   </div>
                 )}
+
+                {/* Description */}
+                <div className="mt-6">
+                  <label className="block text-xs md:text-sm font-bold text-blue-900 mb-2">Description (Optional)</label>
+                  <textarea 
+                    value={requirementsData[selectedProduct].description || ''} 
+                    onChange={(e) => handleDescriptionChange(selectedProduct, e.target.value)}
+                    rows="3" 
+                    placeholder="Add any specific details about this requirement..."
+                    className="w-full px-4 md:px-5 py-3 md:py-3.5 border-2 border-blue-200 rounded-xl focus:outline-none focus:border-blue-600 bg-blue-50 font-medium transition-all placeholder-gray-500 resize-none text-sm md:text-base" 
+                  />
+                </div>
 
                 {/* Image Upload */}
                 <div className="mt-8">
@@ -539,6 +651,21 @@ const BulkOrder = () => {
             <p className="text-xs md:text-sm text-gray-500 mt-3 text-center">
               {user ? "We'll get back to you within 24 hours with a customized quote" : "Please log in to submit your quote request"}
             </p>
+
+            {/* Our Other Works */}
+            <div className="mt-12">
+              <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-6 text-center">Our Other Works</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {otherWorks.map((img, idx) => (
+                  <img
+                    key={idx}
+                    src={img}
+                    alt={`Other work ${idx + 1}`}
+                    className="w-full h-48 object-cover rounded-xl shadow-md hover:shadow-lg transition-shadow"
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -664,6 +791,16 @@ const BulkOrder = () => {
           </div>
         </div>
       </footer>
+
+      <style jsx global>{`
+        .scrollbar-hide {
+          -ms-overflow-style: none;  /* Internet Explorer 10+ */
+          scrollbar-width: none;  /* Firefox */
+        }
+        .scrollbar-hide::-webkit-scrollbar { 
+          display: none;  /* Safari and Chrome */
+        }
+      `}</style>
     </div>
   );
 };

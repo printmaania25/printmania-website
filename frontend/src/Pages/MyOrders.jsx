@@ -258,13 +258,21 @@ fetchBulkQuotes();
                           </div>
                           <div className="p-4 space-y-3">
                             {(item.type || item.size) && (
-                              <p className="text-sm text-gray-700">
-                                <span className="font-medium">Size/Type:</span> {item.type || item.size}
+                              <p className="text-sm text-gray-900">
+                                <span className="font-bold">Size/Type:</span> {item.type || item.size}
                               </p>
                             )}
+
+                              {item.description && item.description.length > 0 && (
+                                <p className="text-sm text-gray-900">
+                                  <span className="font-bold">Description:</span> {item.description}
+                                </p>
+                              )}
+
+
                             {item.image ? (
                               <div>
-                                <p className="text-xs font-medium text-gray-600 mb-2">Uploaded Design:</p>
+                                <p className="text-xs font-bold text-gray-900 mb-2">Uploaded Design:</p>
                                 <img src={item.image} alt="design" className="w-full h-48 object-contain rounded-lg border border-blue-200 bg-gray-50" />
                               </div>
                             ) : (

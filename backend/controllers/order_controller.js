@@ -156,6 +156,12 @@ export const createOrder = async (req, res) => {
       html: emailTemplate("New Order Received", order),
     });
 
+    await sendMail({
+      to: order.useremail,
+      subject: `🛍 Order Placed Successfully id- ${order._id} `,
+      html: emailTemplate("Order Placed Successfully", order),
+    });
+
     res.json({ success: true, message: "Order created", order });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -192,6 +198,13 @@ export const uploadTransactionScreenshots = async (req, res) => {
       html: emailTemplate("Payment Proof Uploaded", order, order.transactionscreenshot),
     });
 
+    await sendMail({
+      to: order.useremail,
+      subject: `💰 Payment Proof Received — ${order._id}`,
+      html: emailTemplate("Payment Proof Received", order, order.transactionscreenshot),
+    });
+
+
     res.json({
       success: true,
       message: "Transaction screenshots uploaded & COD updated",
@@ -221,6 +234,13 @@ export const cancelOrder = async (req, res) => {
       html: emailTemplate("Order Cancelled", order, order.transactionscreenshot),
     });
 
+    await sendMail({
+      to: order.useremail,
+      subject: `❌ Order Cancelled — ${order._id}`,
+      html: emailTemplate("Order Cancelled", order, order.transactionscreenshot),
+    });
+
+
     res.json({ success: true, message: "Order cancelled", order });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -242,6 +262,13 @@ export const markDelivered = async (req, res) => {
       subject: `📦 Order Delivered — ${order._id}`,
       html: emailTemplate("Order Delivered", order, order.transactionscreenshot),
     });
+
+    await sendMail({
+      to: order.useremail,
+      subject: `📦 Order Delivered — ${order._id}`,
+      html: emailTemplate("Order Delivered", order, order.transactionscreenshot),
+    });
+
 
     res.json({ success: true, message: "Order marked delivered", order });
   } catch (err) {
@@ -266,6 +293,13 @@ export const assignTrackingId = async (req, res) => {
       subject: `🚚 Tracking ID Assigned — ${order._id}`,
       html: emailTemplate("Tracking Assigned", order, order.transactionscreenshot),
     });
+
+    await sendMail({
+      to: order.useremail,
+      subject: `🚚 Tracking ID Assigned — ${order._id}`,
+      html: emailTemplate("Tracking ID Assigned", order, order.transactionscreenshot),
+    });
+
 
     res.json({ success: true, message: "Tracking ID updated", order });
   } catch (err) {

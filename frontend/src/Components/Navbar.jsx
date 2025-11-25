@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, X } from 'lucide-react';
+import { User, X, Phone } from 'lucide-react';
 import useUser from "../hooks/useUser";
 import Allapi from "../common";
 import logo from "../assets/logo.png";
@@ -115,16 +115,18 @@ const handleBulkOrderClick = () => {
 
   return (
     <div className="fixed top-0 left-0 w-full h-16 bg-white shadow-lg shadow-blue-500/10 flex items-center justify-between px-4 md:px-8 z-50 border-b border-blue-200/50">
-      <div
-        className={`flex items-center gap-3 cursor-pointer transition-all duration-300 ${searchExpanded ? 'hidden md:flex' : 'flex'}`}
-        onClick={() => navigate("/")}
-      >
-        <div className="w-10 h-10 flex items-center justify-center">
-          <img src={logo} alt="Logo" className="w-full h-full object-contain" />
+      <div className="flex items-center gap-2 md:gap-3">
+        <div
+          className={`flex items-center gap-3 cursor-pointer transition-all duration-300 ${searchExpanded ? 'hidden md:flex' : 'flex'}`}
+          onClick={() => navigate("/")}
+        >
+          <div className="w-10 h-10 flex items-center justify-center">
+            <img src={logo} alt="Logo" className="w-full h-full object-contain" />
+          </div>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-orange-500 bg-clip-text text-transparent hidden sm:block">
+            PrintMaania
+          </h1>
         </div>
-        <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-orange-500 bg-clip-text text-transparent hidden sm:block">
-          PrintMaania
-        </h1>
       </div>
 
       <div
@@ -187,12 +189,38 @@ const handleBulkOrderClick = () => {
         onClick={handleBulkOrderClick}
         className={`flex items-center gap-1 md:gap-2 px-2 md:px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-full font-semibold text-xs md:text-sm shadow-lg shadow-orange-500/20 transition-all duration-300 transform hover:scale-105 mr-2 md:mr-4 ${searchExpanded ? 'hidden md:flex' : 'flex'}`}
       >
-        <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
         </svg>
         <span className="hidden sm:inline">Bulk Order</span>
         <span className="sm:hidden">Bulk</span>
       </button>
+
+      <div className="flex flex-1 justify-end items-center">
+
+      <button
+        onClick={() => window.open('https://wa.me/919063347447', '_blank', 'noopener,noreferrer')}
+        className={`flex items-center justify-center mr-2 w-9 h-9 md:w-11 md:h-11 rounded-full bg-green-500 hover:bg-green-600 text-white shadow-md transition-all duration-300 ${searchExpanded ? 'hidden md:block' : 'block'}`}
+        aria-label="WhatsApp"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.472-.148-.67.149-.198.297-.768.967-.94 1.166-.173.198-.347.223-.644.074-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.173.198-.297.298-.495.099-.198.05-.371-.025-.52-.074-.149-.669-1.611-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.298-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.076 4.487.71.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.718 2.007-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+          <path d="M20.52 3.48A11.92 11.92 0 0012 0C5.383 0 0 5.383 0 12c0 2.116.553 4.19 1.602 6.02L0 24l6.18-1.584A11.936 11.936 0 0012 24c6.617 0 12-5.383 12-12 0-3.197-1.247-6.203-3.48-8.52zM12 21.6a9.56 9.56 0 01-4.91-1.36l-.35-.21-3.67.94.98-3.58-.23-.37A9.55 9.55 0 012.4 12c0-5.283 4.317-9.6 9.6-9.6 5.283 0 9.6 4.317 9.6 9.6 0 5.283-4.317 9.6-9.6 9.6z" />
+        </svg>
+      </button>
+
+        {/* Instagram */}
+        <button
+          onClick={() => window.open('https://www.instagram.com/print_maania?igsh=NGc4dGF5aTBtbWRm', '_blank', 'noopener,noreferrer')}
+          className={`flex items-center justify-center mr-3 w-9 h-9 md:w-11 md:h-11 rounded-full bg-pink-600 hover:bg-pink-700 text-white shadow-md transition-all duration-300 ${searchExpanded ? 'hidden md:block' : 'block'}`}
+          aria-label="Instagram"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M7 2C4.243 2 2 4.243 2 7v10c0 2.757 2.243 5 5 5h10c2.757 0 5-2.243 5-5V7c0-2.757-2.243-5-5-5H7zm10 2c1.654 0 3 1.346 3 3v10c0 1.654-1.346 3-3 3H7c-1.654 0-3-1.346-3-3V7c0-1.654 1.346-3 3-3h10zm-5 3a5 5 0 100 10 5 5 0 000-10zm0 2a3 3 0 110 6 3 3 0 010-6zm4.8-.9a1.1 1.1 0 11-2.2 0 1.1 1.1 0 012.2 0z"/>
+          </svg>
+        </button>
+
+
 
       <div className={`relative ${searchExpanded ? 'hidden md:block' : 'block'}`} ref={menuRef}>
         <div
@@ -261,6 +289,9 @@ const handleBulkOrderClick = () => {
           </div>
         )}
       </div>
+      </div>
+
+
     </div>
   );
 }

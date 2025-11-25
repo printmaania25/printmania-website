@@ -20,6 +20,7 @@ const quoteSchema = new mongoose.Schema(
         image: {
           type: String,
         },
+        description: { type: String }, 
       },
       Banners: {
         size: {
@@ -31,6 +32,7 @@ const quoteSchema = new mongoose.Schema(
         image: {
           type: String,
         },
+        description: { type: String }, 
       },
       IdCards: {
         size: {
@@ -42,6 +44,7 @@ const quoteSchema = new mongoose.Schema(
         image: {
           type: String,
         },
+        description: { type: String }, 
       },
       Certificates: {
         size: {
@@ -53,6 +56,7 @@ const quoteSchema = new mongoose.Schema(
         image: {
           type: String,
         },
+        description: { type: String }, 
       },
       Stickers: {
         size: {
@@ -64,6 +68,7 @@ const quoteSchema = new mongoose.Schema(
         image: {
           type: String,
         },
+        description: { type: String }, 
       },
       Photoframes: {
         size: {
@@ -75,6 +80,7 @@ const quoteSchema = new mongoose.Schema(
         image: {
           type: String,
         },
+        description: { type: String }, 
       },
       Mugs: {
         size: {
@@ -86,6 +92,7 @@ const quoteSchema = new mongoose.Schema(
         image: {
           type: String,
         },
+       description: { type: String }, 
       },
     },
 
