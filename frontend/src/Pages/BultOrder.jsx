@@ -291,11 +291,20 @@ const BulkOrder = () => {
     <div className="min-h-screen bg-white font-sans pt-16">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 bg-white border-b border-blue-100 px-4 md:px-6 py-3 flex justify-between items-center z-50 shadow-sm">
+        <div className='flex flex-1 items-center justify-start'>
+        <button
+            onClick={() => (window.location.href = "/")}
+            className="mr-1 md:mr-3 w-8 h-8 md:w-10 md:h-10 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center transition-all duration-300 shadow-sm"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 md:w-5 md:h-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
         <div className="flex items-center gap-2">
           <img src={logo} alt="PrintMaania" className="h-8 w-auto" />
           <div className="text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-600 to-orange-500 bg-clip-text text-transparent">PrintMaania</div>
         </div>
-
+      </div>
         <div className="flex items-center space-x-1 md:space-x-2">
           <button
             onClick={() => window.open('https://wa.me/919063347447', '_blank', 'noopener,noreferrer')}
@@ -474,7 +483,7 @@ const BulkOrder = () => {
                             key={idx}
                             src={img}
                             alt={`Pre-built shirt ${idx + 1}`}
-                            className="flex-shrink-0 w-32 h-32 md:w-40 md:h-40 object-cover rounded-lg shadow-md"
+                            className="flex-shrink-0 w-32 h-32 md:w-40 md:h-40 object-fill rounded-lg shadow-md"
                           />
                         ))}
                       </div>
@@ -661,7 +670,7 @@ const BulkOrder = () => {
                     key={idx}
                     src={img}
                     alt={`Other work ${idx + 1}`}
-                    className="w-full h-48 object-cover rounded-xl shadow-md hover:shadow-lg transition-shadow"
+                    className="w-full h-70 object-contain rounded-xl shadow-md hover:shadow-lg transition-shadow"
                   />
                 ))}
               </div>
