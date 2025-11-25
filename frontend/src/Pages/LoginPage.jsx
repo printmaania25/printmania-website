@@ -118,7 +118,8 @@ function LoginPage() {
     // Google OAuth will redirect back to callback which will read from localStorage
     
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-    const redirectUri = encodeURIComponent("http://localhost:5173/google/callback");
+    // const redirectUri = encodeURIComponent("http://localhost:5173/google/callback");
+    const redirectUri = encodeURIComponent("https://www.printmaania.com/google/callback");
     const scope = encodeURIComponent("openid email profile");
 
     const googleURL =
@@ -141,7 +142,7 @@ function LoginPage() {
           className="w-10 h-10 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-colors duration-300"
           disabled={isLoading}
         >
-                      < ArrowLeft className="w-5 h-5 text-blue-700" />
+        < ArrowLeft className="w-5 h-5 text-blue-700" />
 
         </button>
         <h1 className="ml-4 text-lg font-bold text-gray-800">Back</h1>
