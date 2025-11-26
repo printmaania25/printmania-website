@@ -1,5 +1,5 @@
-const backapi = "https://printmania-website.onrender.com";
-// const backapi = "http://localhost:5001";
+// const backapi = "https://printmania-website.onrender.com";
+const backapi = "http://localhost:5001";
 
 
 const Allapi = {
@@ -77,6 +77,10 @@ const Allapi = {
     },
     cancel: {
       url: (id) => `${backapi}/api/orders/${id}/cancel`,
+      method: "PUT",
+    },
+        admincancel: {
+      url: (id) => `${backapi}/api/orders/${id}/admincancel`,
       method: "PUT",
     },
     getMyOrders: {

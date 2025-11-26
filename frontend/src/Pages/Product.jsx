@@ -261,6 +261,18 @@ function Product() {
 
             {/* Product Details Section */}
             <div className="space-y-6">
+                        {product.description && (
+            <div className="bg-white rounded-2xl shadow-lg p-4">
+              <label className="block text-xs md:text-sm font-bold text-blue-900 mb-2">
+                Description
+              </label>
+
+              <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                {product.description}
+              </p>
+            </div>
+          )}
+
               {/* Product Info Card */}
               <div className="bg-white rounded-2xl shadow-lg p-6">
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">{product.name}</h2>
@@ -332,7 +344,7 @@ function Product() {
 
               {/* Description */}
               <div className="bg-white rounded-2xl shadow-lg p-6">
-                  <label className="block text-xs md:text-sm font-bold text-blue-900 mb-2">Description (Optional)</label>
+                  <label className="block text-xs md:text-sm font-bold text-blue-900 mb-2">Provide Description (Optional)</label>
                   <textarea 
                     value={description} 
                     onChange={(e) =>setDiscription(e.target.value) }
@@ -466,10 +478,10 @@ function Product() {
             {placingOrder ? (
               <>
                 <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-white"></div>
-                <span>Placing Order...</span>
+                <span>Ordering...</span>
               </>
             ) : (
-              'Place Order'
+              'Buy Now'
             )}
           </button>
         </div>

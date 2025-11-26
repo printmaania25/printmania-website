@@ -116,7 +116,7 @@ function emailTemplate(title, order, screenshots = []) {
     </section>
 
     <section style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
-      <h3 style="margin: 0 0 10px 0; color: #333;">Descriptio:</h3>
+      <h3 style="margin: 0 0 10px 0; color: #333;">User Description:</h3>
       <p style="margin: 5px 0;"> ${order.description}</p>
       </p>
     </section>
@@ -172,17 +172,6 @@ export const createOrder = async (req, res) => {
 
     await User.findByIdAndUpdate(req.user._id, { $push: { orders: order._id } });
 
-    sendMail({
-      to: ADMIN_EMAIL,
-      subject: `New Order Received — Order ${order._id}`,
-      html: emailTemplate("New Order Received", order),
-    });
-
-    sendMail({
-      to: order.useremail,
-      subject: `Order Placed Successfully — Order ${order._id}`,
-      html: emailTemplate("Order Placed Successfully", order),
-    });
 
     res.json({ success: true, message: "Order created", order });
   } catch (err) {
@@ -218,13 +207,13 @@ export const uploadTransactionScreenshots = async (req, res) => {
     // send email with updated status + proof screenshots if any
     sendMail({
       to: ADMIN_EMAIL,
-      subject: `Payment Proof Uploaded — Order ${order._id}`,
+      subject: `Order Placed — Order ${order._id}`,
       html: emailTemplate("Payment Proof Uploaded", order, order.transactionscreenshot),
     });
 
     sendMail({
       to: order.useremail,
-      subject: `Payment Proof Received — Order ${order._id}`,
+      subject: `Order Placed — Order ${order._id}`,
       html: emailTemplate("Payment Proof Received", order, order.transactionscreenshot),
     });
 
@@ -240,6 +229,23 @@ export const uploadTransactionScreenshots = async (req, res) => {
   }
 };
 
+export const adminCancelOrder = async(req,res)=>{
+
+    try {
+    const { id } = req.params;
+    const order = await Order.findById(id);
+    if (!order) return res.status(404).json({ success: false, message: "Order not found" });
+
+    order.cancelled = true;
+    await order.save();
+
+
+    res.json({ success: true, message: "Order cancelled", order });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+
+}
 
 /* ================= CANCEL ORDER ================= */
 export const cancelOrder = async (req, res) => {

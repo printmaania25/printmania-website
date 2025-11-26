@@ -6,6 +6,7 @@ import { Package, Truck, X, Download } from "lucide-react";
 
 function OrderManagement() {
   const { token } = useUser();
+  console.log("token",token);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -16,6 +17,9 @@ function OrderManagement() {
   const [trackingId, setTrackingId] = useState("");
   const [assigningTracking, setAssigningTracking] = useState(false);
   const [trackingError, setTrackingError] = useState("");
+
+  const [cancellingOrderId, setCancellingOrderId] = useState(null);
+
 
   const detailsRef = useRef(null);
 
@@ -50,6 +54,37 @@ function OrderManagement() {
       setLoading(false);
     }
   }
+
+  async function handleCancelOrder(cancelOrderId) {
+  try {
+    setCancellingOrderId(cancelOrderId);
+
+    const res = await fetch(Allapi.orders.admincancel.url(cancelOrderId), {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      setOrders(prev =>
+        prev.map(order =>
+          order._id === cancelOrderId ? { ...order, cancelled: true } : order
+        )
+      );
+
+      if (selectedOrder?._id === cancelOrderId) {
+        setSelectedOrder({ ...selectedOrder, cancelled: true });
+      }
+    }
+  } catch (err) {
+    console.error("Cancel error:", err);
+  } finally {
+    setCancellingOrderId(null);
+  }
+}
+
 
   async function handleMarkDelivered(orderId) {
     try {
@@ -222,33 +257,74 @@ function OrderManagement() {
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold bg-gradient-to-r from-blue-600 to-orange-600 bg-clip-text text-transparent">
                   ₹{order.product.total_price}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span
-                    className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      order.delivered
-                        ? "bg-green-100 text-green-800"
-                        : order.cancelled
-                        ? "bg-red-100 text-red-800"
-                        : "bg-orange-100 text-orange-800"
-                    }`}
-                  >
-                    {order.delivered
-                      ? "Delivered"
-                      : order.cancelled
-                      ? "Cancelled"
-                      : "Pending"}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-xs">
-                  {order.trackingId ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 rounded-full font-mono">
-                      <Truck className="w-3 h-3" />
-                      {order.trackingId}
-                    </span>
-                  ) : (
-                    <span className="text-gray-400">—</span>
-                  )}
-                </td>
+<td className="px-6 py-4 whitespace-nowrap">
+  {/* Delivered */}
+  {order.delivered && (
+    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+      Delivered
+    </span>
+  )}
+
+  {/* Cancelled */}
+  {!order.delivered && order.cancelled && (
+    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+      Cancelled
+    </span>
+  )}
+
+  {/* No Proof */}
+  {!order.delivered &&
+    !order.cancelled &&
+    (!order.transactionscreenshot || order.transactionscreenshot.length === 0) && (
+      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-200 text-red-700">
+        No Proof
+      </span>
+  )}
+
+  {/* Pending */}
+  {!order.delivered &&
+    !order.cancelled &&
+    order.transactionscreenshot &&
+    order.transactionscreenshot.length > 0 && (
+      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-800">
+        Pending
+      </span>
+  )}
+</td>
+
+<td className="px-6 py-4 whitespace-nowrap text-xs">
+  {order.trackingId ? (
+    <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 rounded-full font-mono">
+      <Truck className="w-3 h-3" />
+      {order.trackingId}
+    </span>
+  ) : !order.delivered && !order.cancelled && order.transactionscreenshot?.length === 0 ? (
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        handleCancelOrder(order._id);
+      }}
+      disabled={cancellingOrderId === order._id}
+      className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors ${
+        cancellingOrderId === order._id
+          ? "bg-red-400 cursor-not-allowed text-white"
+          : "bg-red-600 hover:bg-red-700 text-white"
+      }`}
+    >
+      {cancellingOrderId === order._id ? (
+        <div className="flex items-center gap-1">
+          <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+          Cancelling...
+        </div>
+      ) : (
+        "Cancel Order"
+      )}
+    </button>
+  ) : (
+    <span className="text-gray-400">—</span>
+  )}
+</td>
+
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {new Date(order.createdAt).toLocaleDateString()}
                 </td>

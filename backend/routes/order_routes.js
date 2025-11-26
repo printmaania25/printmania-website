@@ -6,7 +6,8 @@ import {
   getOrdersByUser,
   getAllOrders,
   markDelivered,
-  assignTrackingId
+  assignTrackingId,
+  adminCancelOrder
 } from "../controllers/order_controller.js";
 
 import { auth, isAdmin } from "../middleware/auth.js";
@@ -17,6 +18,7 @@ const router = express.Router();
 router.post("/", auth, createOrder);
 router.put("/:id/upload", auth, uploadTransactionScreenshots);
 router.put("/:id/cancel", auth, cancelOrder);
+router.put("/:id/admincancel", auth , isAdmin, adminCancelOrder);
 router.get("/myorders", auth, getOrdersByUser);
 
 // ADMIN ROUTES

@@ -2,7 +2,7 @@ import Product from "../models/Product.js";
 
 export const createProduct = async (req, res) => {
   try {
-    const { name, sizes, mrp, price, pictures, uploadrequired, category, phrases } = req.body;
+    const { name, sizes, mrp, price, pictures, uploadrequired, category, phrases ,description} = req.body;
 
     if (!category) {
       return res.status(400).json({ success: false, message: "Category is required" });
@@ -14,9 +14,11 @@ export const createProduct = async (req, res) => {
       mrp,
       price,
       pictures,
+      description: description,
       uploadrequired,
       category,
-      phrases: phrases || [] // safe default
+      phrases: phrases || [], // safe default
+      
     });
 
     res.json({ success: true, message: "Product created", product });

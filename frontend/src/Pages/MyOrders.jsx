@@ -351,6 +351,7 @@ function MyOrders() {
                           <img
                             key={idx}
                             src={pic}
+                         
                             alt={`${selectedOrder.product.name} ${idx + 1}`}
                             className={`absolute top-0 left-0 w-full h-full object-contain transition-all duration-500 ${
                               idx === currentImageIndex ? 'opacity-100 translate-x-0' : idx < currentImageIndex ? 'opacity-0 -translate-x-full' : 'opacity-0 translate-x-full'
@@ -421,6 +422,13 @@ function MyOrders() {
                         <span className="text-3xl font-bold text-blue-600">₹{selectedOrder.product.total_price}</span>
                       </div>
                     </div>
+
+                        <button
+                          onClick={(e) => {navigate(`/product/${selectedOrder.productRef}`)}}
+                          className="w-full mt-2  py-3 bg-gradient-to-r from-blue-500 to-orange-600 hover:from-blue-600 hover:to-orange-700 text-white rounded-xl text-sm font-bold shadow-lg transition-all duration-300"
+                        >
+                          Click to see the Product
+                        </button>
                   </div>
                 </div>
 
@@ -563,6 +571,15 @@ function MyOrders() {
                     {/* Cancel Button - Only for pending items */}
                     {isPending && (
                       <div className="px-4 pb-4">
+                        {item.transactionscreenshot.length == 0 && (
+                          <button
+                          onClick={(e) => { navigate(`/order/${item._id}`)
+                          }}
+                          className="w-full py-3 mb-2 bg-gradient-to-r from-blue-500 to-orange-600 hover:from-blue-600 hover:to-orange-700 text-white rounded-xl text-sm font-bold shadow-lg transition-all duration-300"
+                        >
+                          Upload Transaction Details
+                        </button>
+                        )}
                         <button
                           onClick={(e) => {
                             e.stopPropagation();

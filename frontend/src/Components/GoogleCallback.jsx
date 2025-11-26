@@ -2,7 +2,7 @@ import { useToast } from "../Providers/ToastProvider";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useRef } from "react";
 import Allapi from "../common";
-import logotext from "../assets/logotext.png";
+import logotext from "../assets/logo.png";
 
 function GoogleCallback() {
   const toastMsg = useToast();
@@ -60,8 +60,7 @@ function GoogleCallback() {
   return (
     <div className="w-full h-screen flex flex-col items-center justify-center bg-gradient-to-b from-white to-blue-50">
       <img src={logotext} alt="PrintMaania" className="h-40 w-auto mb-4" />
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-      <h2 className="text-lg font-semibold text-gray-700">Logging in with Google...</h2>
+      <h2 className="text-lg font-semibold text-gray-700">Logging... in with Google</h2>
     </div>
   );
 }

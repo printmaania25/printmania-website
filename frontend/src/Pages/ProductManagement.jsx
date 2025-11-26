@@ -65,6 +65,7 @@ function ProductManagement() {
     uploadrequired: false,
     pictures: [],
     phrases: [],
+      description: "",  
   };
   const [form, setForm] = useState(initialForm);
   const [newSize, setNewSize] = useState("");
@@ -114,6 +115,7 @@ function ProductManagement() {
       uploadrequired: prod.uploadrequired || false,
       pictures: prod.pictures ? [...prod.pictures] : [],
       phrases: prod.phrases || [],
+          description: prod.description || "", 
     });
     setShowModal(true);
   }
@@ -207,6 +209,7 @@ function ProductManagement() {
       uploadrequired: !!form.uploadrequired,
       category: form.category,
       phrases: form.phrases,
+        description: form.description,  
     };
 
     setSaveLoading(true);
@@ -607,6 +610,27 @@ function ProductManagement() {
                     ))}
                   </div>
                 </div>
+
+                {/* Description */}
+                <div className="md:col-span-2">
+                  <label className="block mb-2 font-semibold text-gray-700">
+                    Description
+                  </label>
+
+                  {isEditing ? (
+                    <textarea
+                      className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[120px] transition-all"
+                      placeholder="Enter product description..."
+                      value={form.description}
+                      onChange={(e) => setForm({ ...form, description: e.target.value })}
+                    />
+                  ) : (
+                    <p className="whitespace-pre-line text-gray-700 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                      {form.description || "No description available"}
+                    </p>
+                  )}
+                </div>
+
 
                 {/* Upload Required */}
                 <div className="md:col-span-2">
