@@ -25,9 +25,18 @@ function MyOrders() {
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
-fetchOrders();
-fetchBulkQuotes();
+    fetchOrders();
+    fetchBulkQuotes();
   }, [activeTab]);
+
+  useEffect(() => {
+    if (selectedOrder) {
+      setCurrentImageIndex(0);
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }, 0);
+    }
+  }, [selectedOrder]);
 
   async function fetchOrders() {
     try {

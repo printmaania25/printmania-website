@@ -30,6 +30,11 @@ function Order() {
     fetchOrder();
   }, []);
 
+  useEffect(() => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [id]);
+
+
   async function fetchOrder() {
     const res = await fetch(Allapi.orders.getMyOrders.url, {
       headers: { Authorization: `Bearer ${token}` }

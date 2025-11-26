@@ -31,6 +31,11 @@ function Product() {
     fetchAll();
   }, []);
 
+  useEffect(() => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [id]);
+
+
   async function fetchAll() {
     try {
       setLoading(true);
