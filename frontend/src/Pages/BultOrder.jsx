@@ -81,7 +81,7 @@ const BulkOrder = () => {
   ];
 
   const tshirtModels = ['Rounded Neck', 'Collar', 'Full hand T shirt', 'Hoodies', 'Sports'];
-  const tshirtFrontOptions = ['Printed front', 'Non printed front'];
+  const tshirtFrontOptions = ['Printed front', 'Non Printed front'];
   const tshirtBackOptions = ['Printed Back', 'Non Printed Back'];
 
   const [tshirtModel, setTshirtModel] = useState('');
@@ -510,48 +510,50 @@ const BulkOrder = () => {
                           className="w-full px-3 md:px-4 py-2 md:py-3 rounded-xl border-2 border-blue-300 focus:border-blue-600 bg-white focus:outline-none text-sm md:text-base" 
                         />
                       </div>
-                      <div className="grid md:grid-cols-2 gap-6 mb-6">
-                        <div>
-                          <label className="block text-xs md:text-sm font-bold text-blue-900 mb-3">Front</label>
-                          <div className="grid grid-cols-2 gap-3 mb-4">
-                            {tshirtFrontOptions.map(f => (
-                              <button key={f} onClick={() => setTshirtFront(f)} className={`py-2 md:py-3 px-3 rounded-xl font-bold transition-all text-sm md:text-base ${tshirtFront === f ? 'bg-blue-600 text-white shadow-lg' : 'bg-white text-blue-800 border-2 border-blue-300 hover:border-blue-500'}`}>
-                                {f}
-                              </button>
-                            ))}
-                          </div>
-                          <div className="flex overflow-x-auto space-x-4 pb-4 scrollbar-hide">
-                            {frontShirts.map((img, idx) => (
-                              <img
-                                key={idx}
-                                src={img}
-                                alt={`Front shirt ${idx + 1}`}
-                                className="flex-shrink-0 w-32 h-32 md:w-40 md:h-40 object-fill rounded-lg shadow-md"
-                              />
-                            ))}
-                          </div>
-                        </div>
-                        <div>
-                          <label className="block text-xs md:text-sm font-bold text-blue-900 mb-3">Back</label>
-                          <div className="grid grid-cols-2 gap-3 mb-4">
-                            {tshirtBackOptions.map(o => (
-                              <button key={o} onClick={() => setTshirtBack(o)} className={`py-2 md:py-3 px-3 rounded-xl font-bold transition-all text-sm md:text-base ${tshirtBack === o ? 'bg-blue-600 text-white shadow-lg' : 'bg-white text-blue-800 border-2 border-blue-300 hover:border-blue-500'}`}>
-                                {o}
-                              </button>
-                            ))}
-                          </div>
-                          <div className="flex overflow-x-auto space-x-4 pb-4 scrollbar-hide">
-                            {backShirts.map((img, idx) => (
-                              <img
-                                key={idx}
-                                src={img}
-                                alt={`Back shirt ${idx + 1}`}
-                                className="flex-shrink-0 w-32 h-32 md:w-40 md:h-40 object-fill rounded-lg shadow-md"
-                              />
-                            ))}
-                          </div>
-                        </div>
-                      </div>
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6">
+  <div>
+    <label className="block text-xs md:text-sm font-bold text-blue-900 mb-3">Front</label>
+    <div className="grid grid-cols-2 gap-2 md:gap-3 mb-4">
+      {tshirtFrontOptions.map(f => (
+        <button key={f} onClick={() => setTshirtFront(f)} className={`py-2 md:py-3 px-2 md:px-3 rounded-xl font-bold transition-all text-xs md:text-base ${tshirtFront === f ? 'bg-blue-600 text-white shadow-lg' : 'bg-white text-blue-800 border-2 border-blue-300 hover:border-blue-500'}`}>
+          <span className="md:hidden">{f.replace('Printed', 'P.').replace('Non printed', 'Non P.')}</span>
+          <span className="hidden md:inline">{f}</span>
+        </button>
+      ))}
+    </div>
+    <div className="flex gap-2 overflow-x-auto pb-3 scrollbar-hide">
+      {frontShirts.map((img, idx) => (
+        <img
+          key={idx}
+          src={img}
+          alt={`Front shirt ${idx + 1}`}
+          className="flex-shrink-0 w-24 h-24 md:w-40 md:h-40 object-cover rounded-lg shadow-md"
+        />
+      ))}
+    </div>
+  </div>
+  <div>
+    <label className="block text-xs md:text-sm font-bold text-blue-900 mb-3">Back</label>
+    <div className="grid grid-cols-2 gap-2 md:gap-3 mb-4">
+      {tshirtBackOptions.map(o => (
+        <button key={o} onClick={() => setTshirtBack(o)} className={`py-2 md:py-3 px-2 md:px-3 rounded-xl font-bold transition-all text-xs md:text-base ${tshirtBack === o ? 'bg-blue-600 text-white shadow-lg' : 'bg-white text-blue-800 border-2 border-blue-300 hover:border-blue-500'}`}>
+          <span className="md:hidden">{o.replace('Printed', 'P.').replace('Non Printed', 'Non P.')}</span>
+          <span className="hidden md:inline">{o}</span>
+        </button>
+      ))}
+    </div>
+    <div className="flex gap-2 overflow-x-auto pb-3 scrollbar-hide">
+      {backShirts.map((img, idx) => (
+        <img
+          key={idx}
+          src={img}
+          alt={`Back shirt ${idx + 1}`}
+          className="flex-shrink-0 w-24 h-24 md:w-40 md:h-40 object-cover rounded-lg shadow-md"
+        />
+      ))}
+    </div>
+  </div>
+</div>
                       <div>
                         <label className="block text-xs md:text-sm font-bold text-blue-900 mb-2">Quantity</label>
                         <input type="number" min="1" value={requirementsData.Tshirts.quantity || ''} onChange={(e) => handleQuantityChange('Tshirts', e.target.value)} className="w-full px-3 md:px-4 py-2 md:py-3 rounded-xl border-2 border-blue-300 focus:border-blue-600 bg-white focus:outline-none text-sm md:text-base" />
